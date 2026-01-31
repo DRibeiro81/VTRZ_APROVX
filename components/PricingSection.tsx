@@ -87,10 +87,31 @@ const PricingSection: React.FC = () => {
     return finalPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
   };
 
-  const handlePurchase = (planId: string) => {
-    console.log(`Iniciando checkout Mercado Pago para o plano: ${planId} com cupom: ${coupon}`);
-    // Aqui entrará a integração com o Mercado Pago
-    alert('Redirecionando para o checkout seguro do Mercado Pago...');
+  const handlePurchase = async (planId: string) => {
+    setIsVerifying(true);
+    try {
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          planId,
+          userEmail: 'cliente@aprovex.com.br', // Idealmente viria de um input ou login
+          influencerCode: coupon
+        })
+      });
+      
+      const data = await response.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error('Falha ao gerar link de pagamento');
+      }
+    } catch (error) {
+      console.error('Erro no checkout:', error);
+      alert('Erro ao iniciar o pagamento. Tente novamente.');
+    } finally {
+      setIsVerifying(false);
+    }
   };
 
   return (
