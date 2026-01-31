@@ -34,12 +34,12 @@ const App: React.FC = () => {
       <Navbar onOpenModal={openModal} />
       <main className="flex-grow">
         <Hero onOpenModal={openModal} />
-        <PricingSection />
         <ProblemSection />
         <SolutionSection />
         <HowItWorks onOpenModal={openModal} />
         <BenefitsSection onOpenModal={openModal} />
         <TargetAudience />
+        <PricingSection />
         <Testimonials />
         <FinalCTA onOpenModal={openModal} />
       </main>
