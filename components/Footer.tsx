@@ -51,7 +51,7 @@ const Footer: React.FC = () => {
             <ul className="space-y-2 text-sm text-slate-600">
                 <li><a href="#!" onClick={preventDefault} className="hover:text-indigo-600">Termos de Uso</a></li>
                 <li><a href="#!" onClick={preventDefault} className="hover:text-indigo-600">Privacidade</a></li>
-                <li><a href="#!" onClick={preventDefault} className="hover:text-indigo-600">Cookies</a></li>
+                <li><a href="/?page=influenciador" className="hover:text-indigo-600">Área do Influenciador</a></li>
             </ul>
           </div>
 

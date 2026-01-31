@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import AnalyzerSection from './components/AnalyzerSection';
@@ -12,12 +12,25 @@ import Testimonials from './components/Testimonials';
 import FinalCTA from './components/FinalCTA';
 import Footer from './components/Footer';
 import WaitlistModal from './components/WaitlistModal';
+import InfluencerDashboard from './pages/InfluencerDashboard';
 
 const App: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState('home');
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('page') === 'influenciador') {
+      setCurrentPage('influencer');
+    }
+  }, []);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
+
+  if (currentPage === 'influencer') {
+    return <InfluencerDashboard />;
+  }
 
   return (
     <div className="min-h-screen flex flex-col w-full overflow-x-hidden relative">
