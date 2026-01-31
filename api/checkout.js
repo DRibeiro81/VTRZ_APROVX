@@ -7,10 +7,16 @@ export default async function handler(req, res) {
 
   const { planId, userEmail, influencerCode } = req.body;
 
-  // 1. Configurar Mercado Pago
-  const client = new MercadoPagoConfig({ 
-    accessToken: process.env.MP_ACCESS_TOKEN 
-  });
+  try {
+    const mpToken = process.env.MP_ACCESS_TOKEN;
+    if (!mpToken) {
+      console.error('ERRO: MP_ACCESS_TOKEN não configurado na Vercel');
+      return res.status(500).json({ error: 'Configuração de pagamento ausente' });
+    }
+
+    const client = new MercadoPagoConfig({ 
+      accessToken: mpToken
+    });
   const preference = new Preference(client);
 
   // 2. Definir Planos
