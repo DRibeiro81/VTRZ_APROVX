@@ -46,11 +46,18 @@ const PricingSection: React.FC = () => {
     setCouponMessage({ text: '', type: '' });
     
     try {
-      // Consulta real ao Supabase para buscar o influenciador/cupom
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/influenciadores?codigo_cupom=eq.${coupon.toUpperCase()}&select=*`, {
+      console.log('Validando cupom:', coupon.toUpperCase());
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      
+      if (!supabaseUrl || !supabaseKey) {
+        throw new Error('Configuração do Supabase ausente (URL/Key)');
+      }
+
+      const response = await fetch(`${supabaseUrl}/rest/v1/influenciadores?codigo_cupom=eq.${coupon.toUpperCase()}&select=*`, {
         headers: {
-          'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`
         }
       });
       
