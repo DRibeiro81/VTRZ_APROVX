@@ -33,7 +33,6 @@ const App: React.FC = () => {
       <Navbar onOpenModal={openModal} />
       <main className="flex-grow">
         <Hero onOpenModal={openModal} />
-        <AnalyzerSection />
         <ProblemSection />
         <SolutionSection />
         <HowItWorks onOpenModal={openModal} />
