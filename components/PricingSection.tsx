@@ -53,7 +53,7 @@ const PricingSection: React.FC = () => {
               }`}
             >
               {plan.highlight && (
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-aprovex-blue text-white px-6 py-2 rounded-full text-sm font-black uppercase tracking-widest shadow-xl ring-4 ring-white">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-aprovex-blue text-white px-8 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-xl ring-4 ring-white whitespace-nowrap">
                   🔥 Mais Vendido
                 </div>
               )}
