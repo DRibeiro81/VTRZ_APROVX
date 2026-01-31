@@ -6,19 +6,19 @@ const testimonials = [
     name: "Ricardo S.",
     role: "Desenvolvedor Full Stack",
     content: "Eu não entendia por que não passava da triagem. A Aprovex mostrou que meu currículo não tinha as palavras-chave que os robôs buscavam. Ajustei e em 2 semanas consegui 5 entrevistas.",
-    image: "https://picsum.photos/100/100?random=1"
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&h=200&auto=format&fit=crop"
   },
   {
     name: "Mariana L.",
     role: "Gerente de Marketing",
     content: "O feedback é muito direto. Sem enrolação. A ferramenta apontou que eu falava muito de 'tarefas' e pouco de 'resultados'. Mudei minha abordagem e fui contratada no mês seguinte.",
-    image: "https://picsum.photos/100/100?random=2"
+    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&h=200&auto=format&fit=crop"
   },
   {
     name: "Carlos Eduardo",
     role: "Analista Financeiro",
     content: "Vale cada centavo. A simulação de entrevista me ajudou a ficar calmo e responder com segurança. A sensação de ir preparado é outra coisa.",
-    image: "https://picsum.photos/100/100?random=3"
+    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&h=200&auto=format&fit=crop"
   }
 ];
 
