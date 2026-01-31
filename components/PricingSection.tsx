@@ -40,21 +40,39 @@ const PricingSection: React.FC = () => {
     }
   ];
 
-  const handleApplyCoupon = () => {
+  const handleApplyCoupon = async () => {
     if (!coupon) return;
     setIsVerifying(true);
+    setCouponMessage({ text: '', type: '' });
     
-    // Simulação de validação (será integrada ao Supabase depois)
-    setTimeout(() => {
-      if (coupon.toUpperCase() === 'APROVEX10') {
-        setDiscount(0.10);
-        setCouponMessage({ text: 'Cupom de 10% aplicado!', type: 'success' });
+    try {
+      // Consulta real ao Supabase para buscar o influenciador/cupom
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/influenciadores?codigo_cupom=eq.${coupon.toUpperCase()}&select=*`, {
+        headers: {
+          'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+        }
+      });
+      
+      const data = await response.json();
+
+      if (data && data.length > 0) {
+        const influencer = data[0];
+        setDiscount(influencer.porcentagem_desconto / 100);
+        setCouponMessage({ 
+          text: `Cupom de ${influencer.porcentagem_desconto}% aplicado! (Indicado por ${influencer.nome})`, 
+          type: 'success' 
+        });
       } else {
         setDiscount(0);
-        setCouponMessage({ text: 'Cupom inválido.', type: 'error' });
+        setCouponMessage({ text: 'Cupom não encontrado.', type: 'error' });
       }
+    } catch (error) {
+      console.error('Erro ao validar cupom:', error);
+      setCouponMessage({ text: 'Erro ao validar cupom. Tente novamente.', type: 'error' });
+    } finally {
       setIsVerifying(false);
-    }, 800);
+    }
   };
 
   const calculatePrice = (price: number) => {
