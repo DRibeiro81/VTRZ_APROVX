@@ -291,7 +291,7 @@ const PricingSection: React.FC = () => {
               <h3 className="text-2xl font-black text-aprovex-graphite mb-2 uppercase tracking-tighter">Quase lá!</h3>
               <p className="text-slate-500 mb-8 font-medium">Informe seus dados para receber os créditos após a aprovação.</p>
               
-              <div className="space-y-4 mb-8">
+              <div className="space-y-4 mb-6">
                 <div>
                   <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Nome Completo</label>
                   <input 
@@ -303,7 +303,7 @@ const PricingSection: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">E-mail</label>
+                  <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">E-mail (Confira atentamente)</label>
                   <input 
                     type="email" 
                     placeholder="seu@email.com"
@@ -312,6 +312,12 @@ const PricingSection: React.FC = () => {
                     onChange={(e) => setUserData({...userData, email: e.target.value})}
                   />
                 </div>
+              </div>
+
+              <div className="bg-amber-50 p-4 rounded-2xl mb-8 border border-amber-100">
+                <p className="text-[11px] text-amber-700 font-bold leading-tight">
+                  ⚠️ ATENÇÃO: Verifique se seu e-mail está correto. É através dele que você receberá seus dados de acesso (login e senha) imediatamente após a aprovação do pagamento.
+                </p>
               </div>
 
               <button 
