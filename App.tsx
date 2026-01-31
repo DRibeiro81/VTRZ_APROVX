@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import AnalyzerSection from './components/AnalyzerSection';
+import PricingSection from './components/PricingSection';
 import ProblemSection from './components/ProblemSection';
 import SolutionSection from './components/SolutionSection';
 import HowItWorks from './components/HowItWorks';
@@ -33,6 +34,7 @@ const App: React.FC = () => {
       <Navbar onOpenModal={openModal} />
       <main className="flex-grow">
         <Hero onOpenModal={openModal} />
+        <PricingSection />
         <ProblemSection />
         <SolutionSection />
         <HowItWorks onOpenModal={openModal} />
