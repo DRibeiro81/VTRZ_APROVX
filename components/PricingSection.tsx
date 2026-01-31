@@ -53,8 +53,8 @@ const PricingSection: React.FC = () => {
               }`}
             >
               {plan.highlight && (
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-aprovex-blue text-white px-4 py-1 rounded-full text-xs font-black uppercase tracking-widest">
-                  Mais Vendido
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-aprovex-graphite text-white px-6 py-2 rounded-full text-sm font-black uppercase tracking-widest shadow-xl ring-4 ring-white">
+                  🔥 Mais Vendido
                 </div>
               )}
               
@@ -80,10 +80,10 @@ const PricingSection: React.FC = () => {
                 ))}
               </ul>
 
-              <button className={`w-full py-4 rounded-xl font-black text-lg transition-all flex items-center justify-center gap-2 ${
+              <button className={`w-full py-5 rounded-2xl font-black text-lg transition-all flex items-center justify-center gap-2 border-2 ${
                 plan.highlight 
-                ? 'bg-aprovex-blue text-white hover:bg-blue-700 shadow-lg shadow-blue-500/20' 
-                : 'bg-aprovex-graphite text-white hover:bg-black'
+                ? 'bg-aprovex-blue border-aprovex-blue text-white hover:bg-blue-700 shadow-xl shadow-blue-500/30 scale-[1.02]' 
+                : 'bg-white border-aprovex-graphite text-aprovex-graphite hover:bg-aprovex-graphite hover:text-white'
               }`}>
                 {plan.buttonText}
                 <Zap className="w-5 h-5 fill-current" />
