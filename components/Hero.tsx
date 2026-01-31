@@ -74,11 +74,11 @@ const Hero: React.FC<HeroProps> = ({ onOpenModal }) => {
             </div>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 leading-[1.15] tracking-tight animate-fade-in-up delay-100">
-              Aumente suas chances de aprovação em <span className="text-indigo-600">processos seletivos</span>.
+              Pare de ser descartado por robôs. <span className="text-indigo-600">Seja visto pelo RH.</span>
             </h1>
             
             <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto lg:mx-0 leading-relaxed animate-fade-in-up delay-200">
-              Deixe de ser ignorado. Nossa inteligência analisa seu perfil, corrige falhas no seu currículo e prepara você estrategicamente para entrevistas.
+              Descubra por que seu currículo nunca chega às mãos do recrutador. O AproveX analisa seu perfil com a mesma tecnologia das grandes empresas e te dá o mapa para vencer os filtros automáticos.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 animate-fade-in-up delay-300">

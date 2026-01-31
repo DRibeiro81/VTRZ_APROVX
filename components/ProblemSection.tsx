@@ -8,12 +8,12 @@ const ProblemSection: React.FC = () => {
       <div className="container mx-auto px-4 md:px-6">
         <RevealOnScroll>
           <div className="max-w-3xl mx-auto text-center mb-16">
-            <h2 className="text-sm font-bold text-indigo-600 tracking-wide uppercase mb-3">O Cenário Atual</h2>
+            <h2 className="text-sm font-bold text-indigo-600 tracking-wide uppercase mb-3">O Abismo do RH</h2>
             <h3 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
-              Por que bons profissionais não estão sendo chamados?
+              Por que currículos brilhantes morrem no "Buraco Negro"?
             </h3>
             <p className="text-slate-600 text-lg">
-              Você tem a experiência, tem as habilidades, mas seu telefone não toca. O problema raramente é sua competência, mas sim como ela é apresentada (e lida) pelo mercado.
+              Você tem a experiência, tem as habilidades, mas seu telefone não toca. O problema não é sua competência, mas sim o <strong>filtro invisível</strong> que descarta seu currículo antes mesmo de um humano o ver.
             </p>
           </div>
         </RevealOnScroll>
