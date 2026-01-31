@@ -90,21 +90,51 @@ const PricingSection: React.FC = () => {
   const handlePurchase = async (planId: string) => {
     setIsVerifying(true);
     try {
-      const response = await fetch('/api/checkout', {
+      const mpToken = 'APP_USR-6200151310053168-013000-5f87344bafd2e52fbbf15da2cab70aff-49346532';
+      
+      const plans = {
+        starter: { title: "AproveX - 1 Crédito", price: 19.90, qty: 1 },
+        professional: { title: "AproveX - 5 Créditos", price: 49.90, qty: 5 },
+        ultimate: { title: "AproveX - 20 Créditos", price: 139.90, qty: 20 }
+      };
+
+      const selectedPlan = (plans as any)[planId];
+      const finalPrice = selectedPlan.price * (1 - discount);
+
+      // Criar preferência direto via API do Mercado Pago
+      const response = await fetch('https://api.mercadopago.com/checkout/preferences', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Authorization': `Bearer ${mpToken}`,
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({
-          planId,
-          userEmail: 'cliente@aprovex.com.br', // Idealmente viria de um input ou login
-          influencerCode: coupon
+          items: [
+            {
+              title: selectedPlan.title,
+              quantity: 1,
+              unit_price: Number(finalPrice.toFixed(2)),
+              currency_id: 'BRL'
+            }
+          ],
+          metadata: {
+            plan_id: planId,
+            user_email: 'cliente@aprovex.com.br',
+            credits_to_add: selectedPlan.qty
+          },
+          back_urls: {
+            success: "https://vtrz-aprovx.vercel.app/?payment=success",
+            failure: "https://vtrz-aprovx.vercel.app/?payment=failed"
+          },
+          auto_return: "approved"
         })
       });
-      
+
       const data = await response.json();
-      if (data.url) {
-        window.location.href = data.url;
+      if (data.init_point) {
+        window.location.href = data.init_point;
       } else {
-        throw new Error('Falha ao gerar link de pagamento');
+        throw new Error('Erro ao gerar checkout');
       }
     } catch (error) {
       console.error('Erro no checkout:', error);
