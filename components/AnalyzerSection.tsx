@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Upload, FileText, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { Upload, Link as LinkIcon, CheckCircle, AlertCircle, Loader2, FileText } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 
 const AnalyzerSection: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [email, setEmail] = useState('');
-  const [jobDescription, setJobDescription] = useState('');
+  const [jobUrl, setJobUrl] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
@@ -17,7 +17,7 @@ const AnalyzerSection: React.FC = () => {
 
   const handleAnalyze = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file || !email) return;
+    if (!file || !email || !jobUrl) return;
 
     setIsUploading(true);
     setStatus('idle');
@@ -37,14 +37,14 @@ const AnalyzerSection: React.FC = () => {
       // Pegar URL pública
       const { data: urlData } = supabase.storage.from('curriculos').getPublicUrl(filePath);
 
-      // 2. Salvar metadados na tabela
+      // 2. Salvar metadados na tabela cv_analyses
       const { error: dbError } = await supabase
         .from('cv_analyses')
         .insert([
           { 
             email, 
             file_url: urlData.publicUrl, 
-            job_description: jobDescription,
+            job_description: jobUrl, // Salvando o link no campo de descrição por enquanto
             status: 'pending' 
           }
         ]);
@@ -52,7 +52,6 @@ const AnalyzerSection: React.FC = () => {
       if (dbError) throw dbError;
 
       setStatus('success');
-      alert('Currículo recebido! Nossa IA está analisando. Você receberá o score em instantes.');
       
     } catch (error) {
       console.error('Erro:', error);
@@ -63,95 +62,116 @@ const AnalyzerSection: React.FC = () => {
   };
 
   return (
-    <section id="analisador" className="py-24 bg-aprovex-gray/20">
+    <section id="analisador" className="py-24 bg-white border-y border-aprovex-gray">
       <div className="container mx-auto px-6">
-        <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-xl overflow-hidden border border-aprovex-gray">
-          <div className="bg-aprovex-blue p-8 text-white text-center">
-            <h2 className="text-3xl font-black uppercase tracking-tighter mb-2">A Máquina de Aprovação</h2>
-            <p className="text-blue-100 font-medium">Suba seu currículo e a vaga desejada. Nossa IA fará o resto.</p>
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl lg:text-5xl font-black text-aprovex-graphite tracking-tighter mb-4 uppercase">
+              A Máquina de <span className="text-aprovex-blue">Aprovação</span>
+            </h2>
+            <p className="text-lg text-slate-500 font-medium">Análise instantânea baseada em inteligência artificial e padrões ATS.</p>
           </div>
-          
-          <form onSubmit={handleAnalyze} className="p-8 lg:p-12 space-y-8">
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* Coluna 1: Dados e Vaga */}
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-xs font-black uppercase text-aprovex-graphite mb-2 tracking-widest">Seu melhor E-mail</label>
-                  <input 
-                    type="email" 
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-4 bg-aprovex-gray/30 border border-aprovex-gray rounded-xl focus:ring-2 focus:ring-aprovex-blue outline-none transition-all"
-                    placeholder="email@exemplo.com"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-black uppercase text-aprovex-graphite mb-2 tracking-widest">Descrição da Vaga (Opcional)</label>
-                  <textarea 
-                    value={jobDescription}
-                    onChange={(e) => setJobDescription(e.target.value)}
-                    className="w-full h-48 px-4 py-4 bg-aprovex-gray/30 border border-aprovex-gray rounded-xl focus:ring-2 focus:ring-aprovex-blue outline-none transition-all resize-none"
-                    placeholder="Cole aqui os requisitos da vaga para uma análise mais precisa..."
-                  />
+
+          <div className="bg-white rounded-[32px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] border border-aprovex-gray overflow-hidden">
+            <form onSubmit={handleAnalyze} className="flex flex-col lg:flex-row">
+              {/* Lado Esquerdo: Inputs */}
+              <div className="flex-1 p-8 lg:p-12 space-y-8 border-b lg:border-b-0 lg:border-r border-aprovex-gray">
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-[11px] font-black uppercase text-aprovex-blue mb-3 tracking-[0.2em]">1. Identificação</label>
+                    <input 
+                      type="email" 
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full px-5 py-4 bg-aprovex-gray/20 border border-aprovex-gray rounded-2xl focus:ring-2 focus:ring-aprovex-blue outline-none transition-all font-bold text-aprovex-graphite placeholder:text-slate-400"
+                      placeholder="seu@email.com"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-black uppercase text-aprovex-blue mb-3 tracking-[0.2em]">2. Alvo (Link da Vaga)</label>
+                    <div className="relative">
+                      <LinkIcon className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                      <input 
+                        type="url" 
+                        required
+                        value={jobUrl}
+                        onChange={(e) => setJobUrl(e.target.value)}
+                        className="w-full px-5 py-4 pl-14 bg-aprovex-gray/20 border border-aprovex-gray rounded-2xl focus:ring-2 focus:ring-aprovex-blue outline-none transition-all font-bold text-aprovex-graphite placeholder:text-slate-400"
+                        placeholder="https://linkedin.com/jobs/..."
+                      />
+                    </div>
+                    <p className="text-[10px] text-slate-400 mt-2 font-bold uppercase tracking-wider">Aceitamos LinkedIn, Gupy, Vagas.com e outros.</p>
+                  </div>
                 </div>
               </div>
 
-              {/* Coluna 2: Upload */}
-              <div className="flex flex-col">
-                <label className="block text-xs font-black uppercase text-aprovex-graphite mb-2 tracking-widest">Seu Currículo (PDF)</label>
-                <div className={`flex-grow border-2 border-dashed rounded-2xl flex flex-col items-center justify-center p-8 transition-all ${file ? 'border-aprovex-green bg-green-50' : 'border-aprovex-gray hover:border-aprovex-blue'}`}>
-                  <input 
-                    type="file" 
-                    accept=".pdf"
-                    onChange={handleFileChange}
-                    className="hidden"
-                    id="cv-upload"
-                  />
-                  <label htmlFor="cv-upload" className="cursor-pointer flex flex-col items-center text-center">
-                    {file ? (
-                      <>
-                        <CheckCircle className="w-12 h-12 text-aprovex-green mb-4" />
-                        <span className="font-bold text-aprovex-graphite">{file.name}</span>
-                        <span className="text-xs text-slate-500 mt-2">Clique para trocar o arquivo</span>
-                      </>
-                    ) : (
-                      <>
-                        <Upload className="w-12 h-12 text-aprovex-blue mb-4" />
-                        <span className="font-bold text-aprovex-graphite">Arraste ou clique para enviar</span>
-                        <span className="text-xs text-slate-500 mt-2">Somente arquivos PDF</span>
-                      </>
-                    )}
-                  </label>
+              {/* Lado Direito: Upload e Botão */}
+              <div className="flex-1 p-8 lg:p-12 bg-aprovex-gray/10 flex flex-col justify-between space-y-8">
+                <div>
+                  <label className="block text-[11px] font-black uppercase text-aprovex-blue mb-3 tracking-[0.2em]">3. Seu Currículo</label>
+                  <div className={`relative group border-2 border-dashed rounded-[24px] p-10 transition-all text-center ${file ? 'border-aprovex-green bg-aprovex-green/5' : 'border-aprovex-gray bg-white hover:border-aprovex-blue'}`}>
+                    <input 
+                      type="file" 
+                      accept=".pdf"
+                      onChange={handleFileChange}
+                      className="hidden"
+                      id="cv-upload-new"
+                    />
+                    <label htmlFor="cv-upload-new" className="cursor-pointer flex flex-col items-center">
+                      {file ? (
+                        <>
+                          <div className="w-16 h-16 bg-aprovex-green/20 rounded-full flex items-center justify-center mb-4">
+                            <CheckCircle className="w-8 h-8 text-aprovex-green" />
+                          </div>
+                          <span className="font-black text-aprovex-graphite text-sm truncate max-w-[200px]">{file.name}</span>
+                          <span className="text-[10px] font-black text-aprovex-blue uppercase mt-2 tracking-widest">Arquivo Pronto</span>
+                        </>
+                      ) : (
+                        <>
+                          <div className="w-16 h-16 bg-aprovex-blue/10 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <Upload className="w-8 h-8 text-aprovex-blue" />
+                          </div>
+                          <span className="font-black text-aprovex-graphite text-sm">Arraste seu PDF aqui</span>
+                          <span className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-wider">ou clique para selecionar</span>
+                        </>
+                      )}
+                    </label>
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            <button 
-              type="submit"
-              disabled={isUploading || !file || !email}
-              className="w-full py-6 bg-aprovex-graphite text-white rounded-2xl font-black text-xl hover:bg-black transition-all shadow-xl flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isUploading ? (
-                <>
-                  <Loader2 className="w-6 h-6 animate-spin" />
-                  PROCESSANDO...
-                </>
-              ) : (
-                <>
-                  OBTER MINHA NOTA GRATUITA
-                  <FileText className="w-6 h-6" />
-                </>
-              )}
-            </button>
+                <button 
+                  type="submit"
+                  disabled={isUploading || !file || !email || !jobUrl}
+                  className="w-full py-6 bg-aprovex-blue text-white rounded-[20px] font-black text-xl hover:bg-blue-700 transition-all shadow-[0_20px_40px_-10px_rgba(31,79,216,0.3)] hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isUploading ? (
+                    <>
+                      <Loader2 className="w-6 h-6 animate-spin" />
+                      PROCESSANDO...
+                    </>
+                  ) : (
+                    <>
+                      RECEBER MINHA NOTA NO E-MAIL
+                      <FileText className="w-6 h-6" />
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
 
             {status === 'success' && (
-              <div className="bg-aprovex-green/10 border border-aprovex-green p-4 rounded-xl flex items-center gap-3 text-aprovex-green">
-                <CheckCircle className="w-5 h-5" />
-                <span className="font-bold">Currículo salvo e enviado para análise!</span>
+              <div className="p-8 bg-aprovex-green text-white text-center animate-in slide-in-from-bottom duration-500">
+                <div className="flex items-center justify-center gap-3">
+                  <CheckCircle className="w-8 h-8" />
+                  <div>
+                    <p className="text-xl font-black uppercase tracking-tighter">Currículo em análise!</p>
+                    <p className="text-sm font-bold opacity-90">Em instantes você receberá o relatório completo em {email}.</p>
+                  </div>
+                </div>
               </div>
             )}
-          </form>
+          </div>
         </div>
       </div>
     </section>
