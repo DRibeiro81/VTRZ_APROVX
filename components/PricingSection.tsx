@@ -158,6 +158,12 @@ const PricingSection: React.FC = () => {
             influencer_id: influencerId,
             commission_percent: commissionPercent
           },
+          payment_methods: {
+            excluded_payment_methods: [],
+            excluded_payment_types: [],
+            installments: 12,
+            default_payment_method_id: "pix"
+          },
           back_urls: {
             success: "https://vtrz-aprovx.vercel.app/?payment=success",
             failure: "https://vtrz-aprovx.vercel.app/?payment=failed"
