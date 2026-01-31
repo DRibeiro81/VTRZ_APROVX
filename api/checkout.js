@@ -30,22 +30,27 @@ export default async function handler(req, res) {
   let finalPrice = selectedPlan.price;
   let influencerData = null;
 
-  // 3. Validar Influenciador no Supabase (Backend para Backend)
+  // 3. Validar Influenciador no Supabase
   if (influencerCode) {
     try {
-      const supRes = await fetch(`${process.env.VITE_SUPABASE_URL}/rest/v1/influenciadores?codigo_cupom=eq.${influencerCode.toUpperCase()}&select=*`, {
-        headers: {
-          'apikey': process.env.VITE_SUPABASE_ANON_KEY,
-          'Authorization': `Bearer ${process.env.VITE_SUPABASE_ANON_KEY}`
+      const supabaseUrl = process.env.VITE_SUPABASE_URL;
+      const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
+
+      if (supabaseUrl && supabaseKey) {
+        const supRes = await fetch(`${supabaseUrl}/rest/v1/influenciadores?codigo_cupom=eq.${influencerCode.toUpperCase()}&select=*`, {
+          headers: {
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`
+          }
+        });
+        const data = await supRes.json();
+        if (data && data.length > 0) {
+          influencerData = data[0];
+          finalPrice = finalPrice * (1 - (influencerData.porcentagem_desconto / 100));
         }
-      });
-      const data = await supRes.json();
-      if (data && data.length > 0) {
-        influencerData = data[0];
-        finalPrice = finalPrice * (1 - (influencerData.porcentagem_desconto / 100));
       }
     } catch (e) {
-      console.error("Erro ao validar influenciador:", e);
+      console.warn("Aviso: Falha ao validar cupom no backend, seguindo com preço original:", e.message);
     }
   }
 
