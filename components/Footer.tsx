@@ -29,9 +29,9 @@ const Footer: React.FC = () => {
           <div>
             <h4 className="font-bold text-slate-900 mb-4">Produto</h4>
             <ul className="space-y-2 text-sm text-slate-600">
+                <li><a href="/?page=login" className="hover:text-indigo-600">Área do Candidato</a></li>
                 <li><a href="#!" onClick={preventDefault} className="hover:text-indigo-600">Como funciona</a></li>
                 <li><a href="#!" onClick={preventDefault} className="hover:text-indigo-600">Preços</a></li>
-                <li><a href="#!" onClick={preventDefault} className="hover:text-indigo-600">Para Empresas</a></li>
                 <li><a href="#!" onClick={preventDefault} className="hover:text-indigo-600">Diagnóstico Grátis</a></li>
             </ul>
           </div>

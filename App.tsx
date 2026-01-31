@@ -13,6 +13,8 @@ import FinalCTA from './components/FinalCTA';
 import Footer from './components/Footer';
 import WaitlistModal from './components/WaitlistModal';
 import InfluencerDashboard from './pages/InfluencerDashboard';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
 
 const App: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -20,8 +22,13 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    if (params.get('page') === 'influenciador') {
+    const page = params.get('page');
+    if (page === 'influenciador') {
       setCurrentPage('influencer');
+    } else if (page === 'login') {
+      setCurrentPage('login');
+    } else if (page === 'dashboard') {
+      setCurrentPage('dashboard');
     }
   }, []);
 
@@ -30,6 +37,14 @@ const App: React.FC = () => {
 
   if (currentPage === 'influencer') {
     return <InfluencerDashboard />;
+  }
+
+  if (currentPage === 'login') {
+    return <Login />;
+  }
+
+  if (currentPage === 'dashboard') {
+    return <Dashboard />;
   }
 
   return (
