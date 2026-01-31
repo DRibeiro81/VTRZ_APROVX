@@ -87,7 +87,21 @@ const PricingSection: React.FC = () => {
     return finalPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
   };
 
-  const handlePurchase = async (planId: string) => {
+  const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
+  const [selectedPlanId, setSelectedPlanId] = useState('');
+  const [userData, setUserData] = useState({ name: '', email: '' });
+
+  const handleOpenCheckout = (planId: string) => {
+    setSelectedPlanId(planId);
+    setIsCheckoutModalOpen(true);
+  };
+
+  const handlePurchase = async () => {
+    if (!userData.email || !userData.name) {
+      alert('Por favor, preencha seu nome e e-mail.');
+      return;
+    }
+
     setIsVerifying(true);
     try {
       const mpToken = 'APP_USR-6200151310053168-013000-5f87344bafd2e52fbbf15da2cab70aff-49346532';
@@ -98,10 +112,26 @@ const PricingSection: React.FC = () => {
         ultimate: { title: "AproveX - 20 Créditos", price: 139.90, qty: 20 }
       };
 
-      const selectedPlan = (plans as any)[planId];
+      const selectedPlan = (plans as any)[selectedPlanId];
       const finalPrice = selectedPlan.price * (1 - discount);
 
-      // Criar preferência direto via API do Mercado Pago
+      // Buscar ID do influenciador se houver cupom
+      let influencerId = null;
+      let commissionPercent = 0;
+      if (couponMessage.type === 'success') {
+        const infRes = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/influenciadores?codigo_cupom=eq.${coupon.toUpperCase()}&select=*`, {
+          headers: {
+            'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+          }
+        });
+        const infData = await infRes.json();
+        if (infData && infData.length > 0) {
+          influencerId = infData[0].id;
+          commissionPercent = infData[0].porcentagem_comissao;
+        }
+      }
+
       const response = await fetch('https://api.mercadopago.com/checkout/preferences', {
         method: 'POST',
         headers: {
@@ -117,10 +147,16 @@ const PricingSection: React.FC = () => {
               currency_id: 'BRL'
             }
           ],
+          payer: {
+            name: userData.name,
+            email: userData.email
+          },
           metadata: {
-            plan_id: planId,
-            user_email: 'cliente@aprovex.com.br',
-            credits_to_add: selectedPlan.qty
+            plan_id: selectedPlanId,
+            user_email: userData.email,
+            credits_to_add: selectedPlan.qty,
+            influencer_id: influencerId,
+            commission_percent: commissionPercent
           },
           back_urls: {
             success: "https://vtrz-aprovx.vercel.app/?payment=success",
@@ -229,7 +265,7 @@ const PricingSection: React.FC = () => {
               </ul>
 
               <button 
-                onClick={() => handlePurchase(plan.id)}
+                onClick={() => handleOpenCheckout(plan.id)}
                 className={`w-full py-5 rounded-2xl font-black text-lg transition-all flex items-center justify-center gap-2 border-2 ${
                 plan.highlight 
                 ? 'bg-white border-aprovex-blue text-aprovex-blue hover:shadow-xl hover:shadow-blue-500/20' 
@@ -241,6 +277,55 @@ const PricingSection: React.FC = () => {
             </div>
           ))}
         </div>
+
+        {/* Checkout Modal */}
+        {isCheckoutModalOpen && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-6">
+            <div className="bg-white rounded-[32px] w-full max-w-md p-8 shadow-2xl animate-fade-in-up relative">
+              <button 
+                onClick={() => setIsCheckoutModalOpen(false)}
+                className="absolute top-6 right-6 text-slate-400 hover:text-aprovex-graphite"
+              >
+                ✕
+              </button>
+              <h3 className="text-2xl font-black text-aprovex-graphite mb-2 uppercase tracking-tighter">Quase lá!</h3>
+              <p className="text-slate-500 mb-8 font-medium">Informe seus dados para receber os créditos após a aprovação.</p>
+              
+              <div className="space-y-4 mb-8">
+                <div>
+                  <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Nome Completo</label>
+                  <input 
+                    type="text" 
+                    placeholder="Seu nome"
+                    className="w-full px-4 py-3 rounded-xl border-2 border-slate-100 focus:border-aprovex-blue outline-none font-bold"
+                    value={userData.name}
+                    onChange={(e) => setUserData({...userData, name: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">E-mail</label>
+                  <input 
+                    type="email" 
+                    placeholder="seu@email.com"
+                    className="w-full px-4 py-3 rounded-xl border-2 border-slate-100 focus:border-aprovex-blue outline-none font-bold"
+                    value={userData.email}
+                    onChange={(e) => setUserData({...userData, email: e.target.value})}
+                  />
+                </div>
+              </div>
+
+              <button 
+                onClick={handlePurchase}
+                disabled={isVerifying}
+                className="w-full bg-aprovex-blue text-white py-4 rounded-xl font-black text-lg hover:bg-blue-700 transition-all flex items-center justify-center gap-2"
+              >
+                {isVerifying ? 'PROCESSANDO...' : 'IR PARA O PAGAMENTO'}
+                <Zap className="w-5 h-5 fill-current" />
+              </button>
+              <p className="text-center text-[10px] text-slate-400 mt-4 font-bold uppercase tracking-wider">Checkout Seguro via Mercado Pago</p>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );
