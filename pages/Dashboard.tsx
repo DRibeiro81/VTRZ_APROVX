@@ -16,7 +16,6 @@ const Dashboard: React.FC = () => {
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [jobUrl, setJobUrl] = useState('');
   const [file, setFile] = useState<File | null>(null);
-  const [isProcessingReal, setIsProcessingReal] = useState(false);
 
   const steps = [
     "Acessando link da vaga...",
@@ -58,50 +57,39 @@ const Dashboard: React.FC = () => {
         }
         return prev + 1;
       });
-    }, 1500);
+    }, 1800);
 
     setTimeout(() => {
       setAnalysisResult({
-        score: jobUrl ? 68 : 72, // Mais rígido
-        matchLevel: jobUrl ? 'Abaixo do Esperado' : 'Atenção Necessária',
+        score: jobUrl ? 64 : 71,
+        matchLevel: jobUrl ? 'REPROVADO PELO ATS' : 'PRECISA DE AJUSTES CRÍTICOS',
         analysisDate: new Date().toLocaleDateString(),
         jobAnalyzed: jobUrl || 'Análise de Perfil Geral',
         metrics: [
-          { label: 'Experiência Profissional', value: 65, color: '#F59E0B' },
-          { label: 'Habilidades Técnicas', value: 78, color: '#3B82F6' },
-          { label: 'Formação Acadêmica', value: 90, color: '#10B981' },
-          { label: 'Soft Skills (IA)', value: 55, color: '#EF4444' },
-          { label: 'Otimização ATS', value: 70, color: '#6366F1' }
-        ],
-        dataPoints: [
-          { name: 'Exp', value: 65 },
-          { name: 'Tec', value: 78 },
-          { name: 'Acad', value: 90 },
-          { name: 'Soft', value: 55 },
-          { name: 'ATS', value: 70 }
+          { label: 'Relevância para a Vaga', value: jobUrl ? 58 : 65, color: '#EF4444' },
+          { label: 'Hard Skills Detectadas', value: 72, color: '#F59E0B' },
+          { label: 'Escaneabilidade (ATS)', value: 85, color: '#10B981' },
+          { label: 'Impacto de Resultados', value: 45, color: '#EF4444' },
+          { label: 'Formatação Executiva', value: 70, color: '#3B82F6' }
         ],
         criticalAlerts: [
-          "Falta de evidências quantitativas (números/resultados) nas últimas experiências.",
-          "O currículo não possui as palavras-chave obrigatórias para o nível Senior.",
-          "Layout com colunas duplas detectado: isso prejudica a leitura de 40% dos sistemas ATS."
+          "DENSIDADE DE PALAVRAS-CHAVE: O currículo falha em atingir a densidade mínima de 4% para termos técnicos vitais da área.",
+          "MÉTRICAS DE IMPACTO: 90% das suas responsabilidades não apresentam números. Recrutadores ignoram currículos sem prova de resultado.",
+          "LINKS QUEBRADOS/AUSENTES: Não detectamos LinkedIn ou Portfólio clicável, o que reduz sua credibilidade em 60%."
         ],
-        strengths: [
-          "Histórico de estabilidade nas empresas anteriores",
-          "Formação em instituição de alto nível",
+        actionPlan: [
+          { priority: 'ALTA', task: 'Substituir descrições passivas por resultados quantitativos (ex: Aumentei X em Y%).' },
+          { priority: 'ALTA', task: 'Adicionar seção de Projetos Relevantes com links para GitHub.' },
+          { priority: 'MÉDIA', task: 'Ajustar o resumo profissional para conter as 5 palavras-chave mais buscadas da vaga.' }
         ],
-        improvements: [
-          "Reescrever o resumo focando em problemas resolvidos, não apenas tarefas.",
-          "Converter o arquivo para layout de coluna única.",
-          "Incluir certificações Cloud (AWS/Azure) para aumentar competitividade."
-        ],
-        skillsMatched: ["React", "TypeScript", "Node.js"],
-        missingKeywords: jobUrl ? ["Docker", "Kubernetes", "Microservices", "Jest", "CI/CD"] : ["Cloud Computing", "Agile Methodologies"]
+        skillsMatched: ["React", "TypeScript", "Node.js", "Tailwind"],
+        missingKeywords: ["Docker", "Kubernetes", "AWS", "CI/CD", "Unit Testing", "Agile"]
       });
       setIsUploading(false);
       setCredits(prev => prev - 1);
       setFile(null);
       setJobUrl('');
-    }, 7500);
+    }, 9000);
   };
 
   return (
@@ -300,7 +288,7 @@ const Dashboard: React.FC = () => {
                           <circle cx="96" cy="96" r="88" stroke="#F1F5F9" strokeWidth="16" fill="transparent" />
                           <circle 
                             cx="96" cy="96" r="88" 
-                            stroke={analysisResult.score > 70 ? '#10B981' : '#F59E0B'} 
+                            stroke={analysisResult.score > 70 ? '#10B981' : '#EF4444'} 
                             strokeWidth="16" 
                             fill="transparent" 
                             strokeDasharray={552} 
@@ -314,7 +302,7 @@ const Dashboard: React.FC = () => {
                           <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Pontos</span>
                         </div>
                       </div>
-                      <div className={`mt-8 px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border ${analysisResult.score > 70 ? 'bg-green-50 text-green-600 border-green-100' : 'bg-amber-50 text-amber-600 border-amber-100'}`}>
+                      <div className={`mt-8 px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border ${analysisResult.score > 70 ? 'bg-green-50 text-green-600 border-green-100' : 'bg-red-50 text-red-600 border-red-100'}`}>
                         {analysisResult.matchLevel}
                       </div>
                     </div>
@@ -387,10 +375,10 @@ const Dashboard: React.FC = () => {
                         <Zap className="w-4 h-4" /> Plano de Ação Corretiva
                       </h4>
                       <div className="space-y-4">
-                        {analysisResult.improvements.map((item: string, i: number) => (
+                        {analysisResult.actionPlan.map((item: any, i: number) => (
                           <div key={i} className="flex gap-4 p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all cursor-default">
-                            <div className="w-6 h-6 rounded-lg bg-aprovex-blue text-white flex items-center justify-center text-[10px] font-black shrink-0">{i+1}</div>
-                            <p className="text-sm font-medium text-slate-300 leading-snug">{item}</p>
+                            <div className={`w-12 h-6 rounded-lg ${item.priority === 'ALTA' ? 'bg-red-500' : 'bg-aprovex-blue'} text-white flex items-center justify-center text-[8px] font-black shrink-0 tracking-tighter`}>{item.priority}</div>
+                            <p className="text-sm font-medium text-slate-300 leading-snug">{item.task}</p>
                           </div>
                         ))}
                       </div>
