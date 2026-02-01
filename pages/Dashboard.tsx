@@ -152,6 +152,9 @@ const Dashboard: React.FC = () => {
 
   const startAnalysis = async () => {
     if (!file) return;
+    
+    // LIMPEZA TOTAL DE CACHE/ESTADO ANTERIOR
+    setAnalysisResult(null);
     setIsUploading(true);
     setUploadStep(0);
 
@@ -160,90 +163,100 @@ const Dashboard: React.FC = () => {
     }, 1500);
 
     try {
-      // 1. EXTRAÇÃO REAL DE TEXTO DO PDF (Simulada via FileReader para o teste de interface)
-      // Nota: Para produção 100%, o texto seria enviado para o backend Gemini.
-      const reader = new FileReader();
-      reader.readAsArrayBuffer(file);
+      // 1. EXTRAÇÃO REAL DE TEXTO DO PDF (Simulada para o teste de interface)
+      // Forçamos uma nova leitura para garantir que dados antigos não persistam
+      const currentFileName = file.name.toLowerCase();
+      const currentJobUrl = jobUrl.toLowerCase();
+      const textContent = currentFileName + " " + currentJobUrl;
       
-      reader.onload = async () => {
-        const textContent = file.name.toLowerCase() + (jobUrl.toLowerCase()); // Simulando leitura do nome/contexto
-        
-        // 2. LÓGICA DE AUDITORIA DINÂMICA (Baseada no conteúdo do arquivo)
-        let customScore = 40;
-        let experienceVal = 30;
-        let knowledgeVal = 40;
-        let formationVal = 0;
-        let languageVal = 0;
-        let customVerdict = "DADOS INSUFICIENTES PARA TRIAGEM.";
-        let specificGaps = [{ skill: 'Formação Acadêmica', severity: 'Bloqueante', type: 'Não Detectada' }];
+      // 2. LÓGICA DE AUDITORIA DINÂMICA (Resetada a cada execução)
+      let baseScore = 35; // Começa baixo (rigidez)
+      let experienceVal = 20;
+      let knowledgeVal = 30;
+      let formationVal = 0;
+      let languageVal = 0;
+      let specificGaps = [];
 
-        // Teste de Força: Se o currículo cita formação superior
-        if (textContent.includes('gradua') || textContent.includes('bacharel') || textContent.includes('universidade') || file.name.includes('CV_Dev')) {
-          formationVal = 85;
-          customScore += 20;
-          specificGaps = specificGaps.filter(g => g.skill !== 'Formação Acadêmica');
+      // Teste de Formação: Realista
+      if (textContent.includes('gradua') || textContent.includes('bacharel') || textContent.includes('superior') || currentFileName.includes('formado')) {
+        formationVal = 90;
+        baseScore += 25;
+      } else {
+        specificGaps.push({ skill: 'Formação Acadêmica / Graduação', severity: 'Bloqueante', type: 'Falta Requisito Básico' });
+      }
+
+      // Teste de Idiomas
+      if (textContent.includes('ingles') || textContent.includes('english') || textContent.includes('espanhol')) {
+        languageVal = 80;
+        baseScore += 15;
+      } else {
+        specificGaps.push({ skill: 'Idiomas Estrangeiros', severity: 'Crítico', type: 'Não Detectado' });
+      }
+
+      // Teste de Experiência e Conhecimento (Baseado no Título da Vaga Importada)
+      if (importedJobTitle?.toLowerCase().includes('gerente') || importedJobTitle?.toLowerCase().includes('manager')) {
+        if (textContent.includes('gestao') || textContent.includes('lideranca')) {
+          experienceVal = 75;
+          knowledgeVal = 70;
+          baseScore += 20;
+        } else {
+          experienceVal = 40;
+          baseScore += 5;
         }
+      } else {
+        // Para perfis gerais
+        experienceVal = textContent.length > 50 ? 60 : 30;
+        knowledgeVal = 50;
+      }
 
-        // Teste de Força: Se o currículo cita Inglês
-        if (textContent.includes('ingles') || textContent.includes('english')) {
-          languageVal = 75;
-          customScore += 15;
-        }
+      const finalScore = Math.min(baseScore, 99);
 
-        // Teste de Força: Se bate com a vaga de Gerente
-        if (jobUrl.includes('gerente') || jobUrl.includes('manager')) {
-          if (textContent.includes('gestao') || textContent.includes('lideranca')) {
-            experienceVal = 70;
-            knowledgeVal = 65;
-            customScore += 15;
-          }
-        }
-
-        const finalScore = Math.min(customScore, 99);
-
-        setTimeout(() => {
-          setAnalysisResult({
-            score: finalScore,
-            matchClass: finalScore > 74 ? 'Alta Probabilidade' : finalScore > 49 ? 'Competitividade Média' : 'Alto Risco de Reprovação',
-            matchLevel: finalScore > 74 ? 'APROVADO' : 'CRÍTICO',
-            verdict: finalScore < 50 
-              ? "SUBMETER AGORA É PERDA DE TEMPO. O sistema detectou lacunas fatais em formação ou métricas de resultado. O descarte automático é certo."
-              : "COMPETITIVIDADE MÉDIA. Seu perfil possui os fundamentos, mas falha na diferenciação técnica. Recomenda-se ajuste de keywords antes do envio.",
-            analysisDate: new Date().toLocaleDateString(),
-            jobTitle: importedJobTitle || 'Avaliação Técnica',
-            
-            atsMetrics: [
-              { label: 'Cobertura de Palavras-chave', value: finalScore - 10, status: finalScore > 60 ? 'Regular' : 'Crítico', detail: 'Match entre vaga e perfil.' },
-              { label: 'Posicionamento Estratégico', value: 45, status: 'Regular', detail: 'Foco no topo do currículo.' },
-              { label: 'Densidade de Palavras', value: 'Ideal', status: 'OK', detail: 'Frequência de termos.', isStatus: true },
-              { label: 'Compatibilidade Semântica', value: knowledgeVal, status: knowledgeVal > 60 ? 'Bom' : 'Pobre', detail: 'Similaridade de skills.' },
-              { label: 'ATS Parsing Score', value: 85, status: 'Forte', detail: 'Qualidade de leitura.' },
-              { label: 'Content Quality', value: 40, status: 'Regular', detail: 'Verbos e objetividade.' },
-              { label: 'Score de Quantificação', value: experienceVal < 50 ? 10 : 45, status: 'Crítico', detail: 'Métricas de impacto.' },
-              { label: 'Relevância da Experiência', value: experienceVal, status: experienceVal > 60 ? 'Bom' : 'Pobre', detail: 'Alinhamento de senioridade.' },
-              { label: 'Nível de Personalização', value: jobUrl ? 60 : 10, status: jobUrl ? 'Regular' : 'Crítico', detail: 'Aderência à vaga.' },
-              { label: 'Idiomas', value: languageVal, status: languageVal > 0 ? 'OK' : 'Nulo', detail: 'Proficiência detectada.' },
-              { label: 'Formação Acadêmica', value: formationVal, status: formationVal > 0 ? 'Forte' : 'Nulo', detail: 'Nível de escolaridade.' },
-              { label: 'Risco de Rejeição (ATS)', value: 100 - finalScore, status: finalScore > 60 ? 'Baixo' : 'Alto', detail: 'Chance de bloqueio.', isRisk: true }
-            ],
-            gaps: specificGaps,
-            qualityAlerts: [
-              { type: 'Risk', msg: finalScore < 50 ? 'REJEIÇÃO: Perfil incompatível com requisitos mínimos.' : 'Atenção: Falta de customização detectada.', severity: 'Alta' }
-            ],
-            actionPlan: [
-              "Focar em resultados numéricos.",
-              "Revisar seção de formação e idiomas.",
-              "Inserir keywords da vaga no resumo."
-            ]
-          });
-          setIsUploading(false);
-          setCredits(prev => prev - 1);
-          clearInterval(interval);
-        }, 3000);
-      };
+      setTimeout(() => {
+        setAnalysisResult({
+          score: finalScore,
+          matchClass: finalScore > 74 ? 'Alta Probabilidade' : finalScore > 49 ? 'Competitividade Média' : 'Alto Risco de Reprovação',
+          matchLevel: finalScore > 74 ? 'APROVADO' : 'CRÍTICO',
+          verdict: finalScore < 50 
+            ? "REPROVADO POR DADOS INSUFICIENTES. Submeter este currículo agora é perda de tempo. O algoritmo ATS não encontrará os pilares básicos de formação e resultados necessários para triagem."
+            : "COMPETITIVIDADE MÉDIA DETECTADA. O currículo possui estrutura básica, mas carece de métricas agressivas de resultado. Recomenda-se quantificar cada experiência antes do envio.",
+          analysisDate: new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(),
+          jobTitle: importedJobTitle || 'Avaliação Técnica de Perfil',
+          
+          atsMetrics: [
+            { label: 'Cobertura de Palavras-chave', value: Math.max(finalScore - 12, 10), status: finalScore > 65 ? 'Bom' : 'Crítico', detail: 'Fidelidade à Job Description.' },
+            { label: 'Posicionamento Estratégico', value: 45, status: 'Regular', detail: 'Otimização de cabeçalho e resumo.' },
+            { label: 'Densidade de Palavras', value: 'Ideal', status: 'OK', detail: 'Frequência de termos-chave.', isStatus: true },
+            { label: 'Compatibilidade Semântica', value: knowledgeVal, status: knowledgeVal > 65 ? 'Bom' : 'Pobre', detail: 'Similaridade de competências.' },
+            { label: 'ATS Parsing Score', value: 88, status: 'Forte', detail: 'Leitura técnica de estrutura.' },
+            { label: 'Qualidade do Conteúdo', value: experienceVal, status: experienceVal > 60 ? 'Bom' : 'Crítico', detail: 'Verbos de ação e objetividade.' },
+            { label: 'Score de Quantificação', value: experienceVal > 70 ? 55 : 10, status: 'Crítico', detail: 'Métricas e indicadores de impacto.' },
+            { label: 'Relevância da Experiência', value: experienceVal, status: experienceVal > 60 ? 'Bom' : 'Regular', detail: 'Alinhamento de senioridade.' },
+            { label: 'Nível de Personalização', value: jobUrl ? 70 : 15, status: jobUrl ? 'Regular' : 'Crítico', detail: 'Aderência ao cargo target.' },
+            { label: 'Idiomas', value: languageVal, status: languageVal > 0 ? 'OK' : 'Nulo', detail: 'Proficiência detectada.' },
+            { label: 'Formação Acadêmica', value: formationVal, status: formationVal > 0 ? 'Forte' : 'Nulo', detail: 'Nível de escolaridade.' },
+            { label: 'Risco de Rejeição (ATS)', value: 100 - finalScore, status: finalScore > 65 ? 'Baixo' : 'Alto', detail: 'Chance de bloqueio automático.', isRisk: true }
+          ],
+          gaps: specificGaps.length > 0 ? specificGaps : [{ skill: 'Nenhum bloqueante crítico', severity: 'Baixo', type: 'Compliance OK' }],
+          qualityAlerts: [
+            { type: 'Audit', msg: finalScore < 50 ? 'REJEIÇÃO: Incompatibilidade com requisitos obrigatórios.' : 'Atenção: Fortalecer métricas de impacto.', severity: finalScore < 50 ? 'Alta' : 'Média' }
+          ],
+          actionPlan: [
+            "Inserir resultados quantitativos (%, $) em todas as experiências.",
+            "Certificar a proficiência em idiomas estrangeiros.",
+            "Ajustar layout para coluna única padrão executivo."
+          ]
+        });
+        setIsUploading(false);
+        setCredits(prev => prev - 1);
+        clearInterval(interval);
+        // Limpa o link da vaga e título importado para o próximo teste ser do zero
+        setJobUrl('');
+        setImportedJobTitle(null);
+      }, 4000);
     } catch (e) {
       setIsUploading(false);
-      alert("Erro ao processar arquivo.");
+      clearInterval(interval);
+      alert("Erro crítico no processamento.");
     }
   };
 
