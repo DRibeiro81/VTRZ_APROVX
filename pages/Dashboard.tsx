@@ -9,18 +9,78 @@ import {
 import Logo from '../components/Logo';
 import { supabase } from '../lib/supabaseClient';
 
-// Definições de cenário ideal para o Modal
-const IDEAL_SCENARIOS: Record<string, string> = {
-  'Cobertura de Palavras-chave': 'O cenário ideal é atingir 80% ou mais de correspondência. Você deve incluir termos técnicos e "soft skills" exatamente como descritos na vaga.',
-  'Posicionamento Estratégico': 'As palavras-chave vitais devem aparecer no Título Profissional e no Resumo. O ATS prioriza termos encontrados no topo do documento.',
-  'Densidade de Palavras': 'A densidade ideal é entre 2% e 4% por termo. Menos que isso é irrelevante; mais que isso é considerado "keyword stuffing" e causa rejeição.',
-  'Compatibilidade Semântica': 'O sistema deve reconhecer que você possui a habilidade mesmo sem usar o termo exato. Ex: "Desenvolvimento de Interfaces" é semanticamente próximo a "Frontend".',
-  'Qualidade de Leitura (Parsing)': 'O documento deve ser coluna única, sem tabelas complexas ou gráficos. O texto deve ser selecionável e em fontes padrão.',
-  'Qualidade do Conteúdo': 'Utilize verbos de ação fortes (Gerenciei, Desenvolvi, Reduzi) e evite clichês como "apaixonado por tecnologia".',
-  'Score de Quantificação': 'Cada experiência deve conter pelo menos uma métrica numérica. Ex: "Aumento de 15% em vendas" ou "Redução de 2h no processo".',
-  'Relevância da Experiência': 'Suas últimas duas experiências devem ter pelo menos 70% de similaridade técnica com as responsabilidades do cargo pretendido.',
-  'Nível de Personalização': 'O currículo não deve parecer um modelo padrão. Ele deve citar tecnologias e desafios específicos mencionados na Job Description.',
-  'Risco de Rejeição (ATS)': 'O cenário ideal é risco ZERO. Evite informações excessivamente pessoais, fotos ou layouts criativos demais que confundem o robô.'
+// Definições de cenário ideal e EXEMPLOS PRÁTICOS para o Modal
+const IDEAL_SCENARIOS: Record<string, { scenario: string, examples: string[] }> = {
+  'Cobertura de Palavras-chave': {
+    scenario: 'Atingir 80% ou mais de correspondência. O ATS busca termos técnicos e competências comportamentais específicas da vaga.',
+    examples: [
+      '❌ Ruim: "Experiência com vendas e gestão."',
+      '✅ Ideal: "Experiência com CRM Salesforce, negociação B2B e fechamento de contratos de alto ticket."'
+    ]
+  },
+  'Posicionamento Estratégico': {
+    scenario: 'As palavras-chave vitais devem aparecer logo no início (Título Profissional e Resumo). O ATS atribui pesos maiores aos termos encontrados no topo.',
+    examples: [
+      '❌ Ruim: Colocar suas principais skills apenas lá no final do currículo.',
+      '✅ Ideal: "Título: Gerente Administrativo Sênior | Especialista em Gestão de Facilities e Budget."'
+    ]
+  },
+  'Densidade de Palavras': {
+    scenario: 'A frequência ideal é entre 2% e 4%. Menos que isso torna o termo irrelevante; mais que isso é "keyword stuffing" (spam) e causa rejeição automática.',
+    examples: [
+      '❌ Ruim: Repetir "Gerente" 50 vezes em um texto curto.',
+      '✅ Ideal: Distribuir o termo naturalmente nas descrições de cargo e na seção de habilidades.'
+    ]
+  },
+  'Compatibilidade Semântica': {
+    scenario: 'O sistema reconhece sinônimos e competências correlatas. O ideal é usar o vocabulário padrão do mercado para o seu cargo.',
+    examples: [
+      '❌ Ruim: "Trabalho fazendo sites" (Linguagem informal).',
+      '✅ Ideal: "Desenvolvedor Frontend" ou "Engenheiro de Software" (Linguagem que o sistema reconhece).'
+    ]
+  },
+  'Qualidade de Leitura (Parsing)': {
+    scenario: 'O documento deve ser de coluna única, em PDF (texto selecionável). Layouts criativos com tabelas e gráficos escondem informações do robô.',
+    examples: [
+      '❌ Ruim: Currículos feitos no Canva com duas colunas e muitos ícones.',
+      '✅ Ideal: Layout clean, coluna única, fontes padrão (Arial, Inter, Roboto).'
+    ]
+  },
+  'Qualidade do Conteúdo': {
+    scenario: 'O robô prioriza frases diretas e objetivas. O ideal é focar no que você ENTREGOU, não apenas no que você fazia.',
+    examples: [
+      '❌ Ruim: "Responsável pelo atendimento ao cliente."',
+      '✅ Ideal: "Gerenciei carteira de 500+ clientes, mantendo churn abaixo de 2%."'
+    ]
+  },
+  'Score de Quantificação': {
+    scenario: 'O cenário de aprovação exige números. Cada experiência deve ter pelo menos uma métrica de sucesso (KPI).',
+    examples: [
+      '❌ Ruim: "Melhorei a eficiência da equipe."',
+      '✅ Ideal: "Aumentei a produtividade da equipe em 25% através da implementação de novas metodologias ágeis."'
+    ]
+  },
+  'Relevância da Experiência': {
+    scenario: 'Suas últimas experiências devem ser um espelho das responsabilidades da vaga. O ATS foca nos últimos 3 a 5 anos.',
+    examples: [
+      '❌ Ruim: Tentar vaga de Gerente com currículo que descreve apenas tarefas operacionais.',
+      '✅ Ideal: Destacar responsabilidades de liderança e gestão financeira nas experiências recentes.'
+    ]
+  },
+  'Nível de Personalização': {
+    scenario: 'O currículo deve ser único para aquela vaga. O ideal é citar os desafios específicos que a empresa mencionou na Job Description.',
+    examples: [
+      '❌ Ruim: Mandar o mesmo PDF para 10 empresas diferentes.',
+      '✅ Ideal: Adaptar o resumo destacando exatamente a skill que a vaga pede como "obrigatória".'
+    ]
+  },
+  'Risco de Rejeição (ATS)': {
+    scenario: 'Risco zero. O ideal é não dar motivos para o algoritmo te descartar por "falta de informações" ou "formato inválido".',
+    examples: [
+      '❌ Ruim: Não colocar cidade de residência ou deixar o LinkedIn desatualizado.',
+      '✅ Ideal: Currículo completo, com todos os links funcionando e formação acadêmica explícita.'
+    ]
+  }
 };
 
 const Dashboard: React.FC = () => {
@@ -155,10 +215,20 @@ const Dashboard: React.FC = () => {
               <button onClick={() => setModalMetric(null)} className="p-2 hover:bg-slate-50 rounded-full transition-colors"><X className="w-5 h-5 text-slate-400" /></button>
             </div>
             <p className="text-slate-500 font-bold text-[10px] uppercase tracking-widest mb-2">Cenário Ideal para Aprovação</p>
-            <p className="text-slate-600 text-sm leading-relaxed font-medium mb-8">
-              {IDEAL_SCENARIOS[modalMetric] || "Informação indisponível para esta métrica."}
+            <p className="text-slate-600 text-sm leading-relaxed font-medium mb-6">
+              {IDEAL_SCENARIOS[modalMetric]?.scenario || "Informação indisponível."}
             </p>
-            <button onClick={() => setModalMetric(null)} className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-aprovex-blue transition-all">Entendido</button>
+            
+            <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100 mb-8">
+              <p className="text-slate-900 font-black text-[10px] uppercase tracking-widest mb-4">Exemplos Práticos</p>
+              <div className="space-y-4">
+                {IDEAL_SCENARIOS[modalMetric]?.examples.map((ex, idx) => (
+                  <p key={idx} className="text-xs font-bold leading-relaxed">{ex}</p>
+                ))}
+              </div>
+            </div>
+
+            <button onClick={() => setModalMetric(null)} className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-aprovex-blue transition-all shadow-xl shadow-slate-900/10">Fechar Guia</button>
           </div>
         </div>
       )}
