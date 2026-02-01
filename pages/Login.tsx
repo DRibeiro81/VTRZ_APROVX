@@ -62,6 +62,22 @@ const Login: React.FC = () => {
           <Logo />
         </div>
         
+        {/* Seletor de Modo (Login / Cadastro) */}
+        <div className="flex bg-slate-100 p-1.5 rounded-2xl mb-10">
+          <button 
+            onClick={() => setIsRegistering(false)}
+            className={`flex-1 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${!isRegistering ? 'bg-white text-aprovex-blue shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+          >
+            Já sou aluno
+          </button>
+          <button 
+            onClick={() => setIsRegistering(true)}
+            className={`flex-1 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${isRegistering ? 'bg-white text-aprovex-blue shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+          >
+            Quero me cadastrar
+          </button>
+        </div>
+
         <h1 className="text-3xl font-black text-aprovex-graphite text-center uppercase tracking-tighter mb-2">
           {isRegistering ? 'CRIAR' : 'ÁREA DO'} <span className="text-aprovex-blue">{isRegistering ? 'CONTA' : 'CANDIDATO'}</span>
         </h1>
