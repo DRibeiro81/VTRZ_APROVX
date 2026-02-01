@@ -54,6 +54,12 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenModal }) => {
           <a href="#" onClick={(e) => scrollToSection(e, 'problema')} className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Por que não sou chamado?</a>
           <a href="#" onClick={(e) => scrollToSection(e, 'solucao')} className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">A Solução</a>
           <a href="#" onClick={(e) => scrollToSection(e, 'como-funciona')} className="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Como Funciona</a>
+          <a 
+            href="/?page=login" 
+            className="text-sm font-bold text-slate-700 hover:text-indigo-600 transition-colors"
+          >
+            Login
+          </a>
           <button 
             onClick={handleCTAClick} 
             className="bg-slate-900 text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-slate-800 transition-all shadow-md hover:shadow-lg"
@@ -77,6 +83,7 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenModal }) => {
           <a href="#" className="text-slate-600 font-medium p-2" onClick={(e) => scrollToSection(e, 'problema')}>O Problema</a>
           <a href="#" className="text-slate-600 font-medium p-2" onClick={(e) => scrollToSection(e, 'solucao')}>A Solução</a>
           <a href="#" className="text-slate-600 font-medium p-2" onClick={(e) => scrollToSection(e, 'como-funciona')}>Como Funciona</a>
+          <a href="/?page=login" className="text-slate-600 font-bold p-2">Login</a>
           <button className="bg-indigo-600 text-white w-full py-3 rounded-lg font-bold text-center block" onClick={handleCTAClick}>
             Começar agora
           </button>
