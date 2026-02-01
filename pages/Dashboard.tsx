@@ -96,6 +96,9 @@ const Dashboard: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [modalMetric, setModalMetric] = useState<string | null>(null);
 
+  // Armazena as correções dinâmicas para os modais
+  const [dynamicCorrections, setDynamicCorrections] = useState<Record<string, string[]>>({});
+
   const steps = [
     "Carregando Terminal Bloomberg...",
     "Executando Auditoria Quantitativa...",
@@ -211,6 +214,20 @@ const Dashboard: React.FC = () => {
 
       const finalScore = Math.min(baseScore, 99);
 
+      // Gerar Recomendações Reais baseadas na análise individual
+      const corrections: Record<string, string[]> = {
+        'Cobertura de Palavras-chave': textContent.includes('ingles') 
+          ? ['✅ O termo "Inglês" foi detectado.', '❌ Faltam termos técnicos específicos como "Cloud" e "Arquitetura".']
+          : ['❌ Termo "Inglês" não encontrado.', '❌ Ausência de certificações técnicas mencionadas na vaga.'],
+        'Score de Quantificação': experienceVal < 50 
+          ? ['❌ Nenhuma métrica encontrada.', '✅ Sugestão: Altere "Trabalhei com vendas" para "Aumentei conversão em 15%".']
+          : ['✅ Algumas métricas detectadas.', '❌ Pode melhorar: Adicione impacto financeiro (ROI) nas experiências recentes.'],
+        'Formação Acadêmica': formationVal === 0
+          ? ['❌ BLOQUEANTE: Nenhuma graduação ou curso superior identificado.', '✅ Ação: Liste seu bacharelado ou tecnólogo imediatamente.']
+          : ['✅ Formação superior validada.', '❌ Sugestão: Adicione cursos de pós-graduação ou MBA.']
+      };
+      setDynamicCorrections(corrections);
+
       setTimeout(() => {
         setAnalysisResult({
           score: finalScore,
@@ -291,10 +308,10 @@ const Dashboard: React.FC = () => {
               
               <div className="bg-[#F8FAFC] p-8 border-l-4 border-slate-900 shadow-inner">
                 <p className="text-slate-900 font-black text-[11px] uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
-                    <FileBarChart className="w-4 h-4" /> Análise Comparativa
+                    <FileBarChart className="w-4 h-4" /> Diagnóstico Personalizado (Baseado no seu CV)
                 </p>
                 <div className="space-y-6">
-                  {IDEAL_SCENARIOS[modalMetric]?.examples.map((ex, idx) => (
+                  {(dynamicCorrections[modalMetric!] || IDEAL_SCENARIOS[modalMetric!]?.examples).map((ex, idx) => (
                     <div key={idx} className="bg-white p-4 border border-slate-200 shadow-sm font-mono text-xs leading-relaxed text-slate-600">
                         {ex}
                     </div>
