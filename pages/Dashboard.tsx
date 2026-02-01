@@ -46,30 +46,30 @@ const Dashboard: React.FC = () => {
 
     setTimeout(() => {
       setAnalysisResult({
-        score: jobUrl ? 61 : 68,
-        matchLevel: jobUrl ? 'CRÍTICO' : 'INSUFICIENTE',
-        jobTitle: jobUrl ? 'Desenvolvedor Full Stack Sênior' : 'Perfil Geral Executivo',
+        score: jobUrl ? 54 : 62,
+        matchLevel: 'REPROVADO POR DADOS INSUFICIENTES',
+        jobTitle: jobUrl ? 'Desenvolvedor Full Stack Sênior' : 'Avaliação de Perfil Geral',
         analysisDate: new Date().toLocaleDateString(),
         metrics: [
-          { label: 'Relevância', value: jobUrl ? 45 : 60, color: '#EF4444' },
-          { label: 'Hard Skills', value: 72, color: '#F59E0B' },
-          { label: 'ATS Scan', value: 88, color: '#10B981' },
-          { label: 'Resultados', value: 30, color: '#EF4444' }
+          { label: 'Aderência à Vaga', value: jobUrl ? 35 : 45, color: '#EF4444' },
+          { label: 'Densidade de Keywords', value: 42, color: '#EF4444' },
+          { label: 'Escaneabilidade ATS', value: 58, color: '#F59E0B' },
+          { label: 'Prova de Resultado', value: 20, color: '#EF4444' }
         ],
         strengths: [
-          "Estrutura técnica compatível com 95% dos leitores ATS.",
-          "Domínio comprovado de React e Node.js.",
-          "Histórico profissional estável."
+          "Informações de contato e links sociais bem localizados.",
+          "Formação acadêmica relevante para o cargo pretendido.",
+          "Arquivo em formato PDF legível por OCR básico."
         ],
         weaknesses: [
-          "Ausência total de métricas (KPIs/ROIs).",
-          "Falta de palavras-chave: Docker, AWS, CI/CD.",
-          "Resumo profissional genérico e passivo."
+          "CRÍTICO: O currículo descreve 'responsabilidades' e não 'conquistas'. Ausência de métricas reduz sua nota em 70%.",
+          "LAYOUT: O uso de elementos gráficos/colunas confunde algoritmos ATS modernos, gerando dados truncados.",
+          "DÉFICIT TÉCNICO: Falta de menção a ferramentas obrigatórias (Docker, CI/CD, AWS) para o nível de sênior esperado."
         ],
         actionPlan: [
-          "Substituir descrições por resultados numéricos.",
-          "Adicionar seções de projetos com links externos.",
-          "Converter layout para coluna única."
+          "Reestruturar cada experiência focando na fórmula: 'Fiz [X] medido por [Y] que resultou em [Z]'.",
+          "Migrar para um layout de coluna única padrão Google/Amazon.",
+          "Inserir seção de Habilidades Técnicas com palavras-chave exatas da descrição da vaga."
         ]
       });
       setIsUploading(false);
