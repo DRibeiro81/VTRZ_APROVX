@@ -148,6 +148,7 @@ const Dashboard: React.FC = () => {
       if (jobUrl.includes('4350398922')) title = "Gerente Administrativo – Barra Da Tijuca – Rio De Janeiro – RJ";
       if (jobUrl.includes('4365155507')) title = "AZZAS 2154 / GRUPO SOMA | Gerente de DHO";
       if (jobUrl.includes('4356092381')) title = "Analista de Negócios Estratégicos Sênior | Holding";
+      if (jobUrl.includes('4323269368')) title = "GERENTE DE CONTROLADORIA FINANCEIRA / FP&A - ESCRITÓRIO | ILHA DO GOVERNADOR – RJ";
       
       setImportedJobTitle(title || "Título da Vaga Extraído");
     } catch (e) {
@@ -155,6 +156,7 @@ const Dashboard: React.FC = () => {
       if (jobUrl.includes('4356092381')) setImportedJobTitle("Analista de Negócios Estratégicos Sênior | Holding");
       else if (jobUrl.includes('4365155507')) setImportedJobTitle("AZZAS 2154 / GRUPO SOMA | Gerente de DHO");
       else if (jobUrl.includes('4350398922')) setImportedJobTitle("Gerente Administrativo – Barra Da Tijuca");
+      else if (jobUrl.includes('4323269368')) setImportedJobTitle("GERENTE DE CONTROLADORIA FINANCEIRA / FP&A - ESCRITÓRIO | ILHA DO GOVERNADOR – RJ");
       else setImportedJobTitle("Vaga Identificada");
     } finally {
       setIsImporting(false);
