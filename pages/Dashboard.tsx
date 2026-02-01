@@ -56,16 +56,16 @@ const Dashboard: React.FC = () => {
         jobTitle: jobUrl ? 'Cargo Alvo Detectado' : 'Avaliação Técnica de Perfil',
         
         atsMetrics: [
-          { label: 'Keyword Match Rate', value: 25, status: 'Crítico', detail: 'Baixa cobertura de termos da vaga.' },
-          { label: 'Keyword Placement', value: 10, status: 'Crítico', detail: 'Estrutura ignorada pelo ATS.' },
-          { label: 'Keyword Density', value: 'Baixa', status: 'Incompleto', detail: 'Abaixo do limiar de relevância.', isStatus: true },
-          { label: 'Semantic Skill Match', value: 30, status: 'Pobre', detail: 'Baixa correlação com o cargo.' },
-          { label: 'ATS Parsing Score', value: 45, status: 'Regular', detail: 'Layout legível, mas sem dados.' },
-          { label: 'Content Quality', value: 20, status: 'Crítico', detail: 'Falta de verbos de ação.' },
-          { label: 'Quantification Score', value: 0, status: 'Nulo', detail: 'Sem métricas ou números.' },
-          { label: 'Experience Relevance', value: 35, status: 'Pobre', detail: 'Experiência não sustenta nível.' },
-          { label: 'Customization Score', value: 5, status: 'Crítico', detail: 'Currículo 100% genérico.' },
-          { label: 'ATS Risk Score', value: 85, status: 'Crítico', detail: 'Altíssimo risco de descarte.', isRisk: true }
+          { label: 'Cobertura de Palavras-chave', value: 25, status: 'Crítico', detail: 'Baixa presença de termos da vaga.' },
+          { label: 'Posicionamento Estratégico', value: 10, status: 'Crítico', detail: 'Keywords ausentes em seções nobres.' },
+          { label: 'Densidade de Palavras', value: 'Baixa', status: 'Incompleto', detail: 'Frequência insuficiente.', isStatus: true },
+          { label: 'Compatibilidade Semântica', value: 30, status: 'Pobre', detail: 'Baixa correlação contextual.' },
+          { label: 'Qualidade de Leitura (Parsing)', value: 45, status: 'Regular', detail: 'Estrutura básica reconhecida.' },
+          { label: 'Qualidade do Conteúdo', value: 20, status: 'Crítico', detail: 'Linguagem passiva e genérica.' },
+          { label: 'Score de Quantificação', value: 0, status: 'Nulo', detail: 'Ausência de métricas e números.' },
+          { label: 'Relevância da Experiência', value: 35, status: 'Pobre', detail: 'Contexto profissional insuficiente.' },
+          { label: 'Nível de Personalização', value: 5, status: 'Crítico', detail: 'Currículo 100% genérico.' },
+          { label: 'Risco de Rejeição (ATS)', value: 85, status: 'Crítico', detail: 'Alta probabilidade de descarte.', isRisk: true }
         ],
 
         gaps: [
@@ -243,7 +243,7 @@ const Dashboard: React.FC = () => {
                     {/* Skill Gap Score (Bloqueantes Reais) */}
                     <div className="lg:col-span-2 bg-white border border-slate-100 rounded-[32px] shadow-sm overflow-hidden flex flex-col">
                       <div className="bg-slate-900 px-6 py-4 flex items-center justify-between">
-                        <span className="text-[10px] font-black text-white uppercase tracking-widest flex items-center gap-2"><Layers className="w-3.5 h-3.5 text-aprovex-blue" /> Skill Gap Score</span>
+                        <span className="text-[10px] font-black text-white uppercase tracking-widest flex items-center gap-2"><Layers className="w-3.5 h-3.5 text-aprovex-blue" /> Lacunas de Competência</span>
                         <span className="text-[9px] font-black text-red-400 uppercase tracking-widest">BLOQUEANTE</span>
                       </div>
                       <div className="p-6 space-y-4 flex-grow">
