@@ -12,9 +12,9 @@ import Testimonials from './components/Testimonials';
 import FinalCTA from './components/FinalCTA';
 import Footer from './components/Footer';
 import WaitlistModal from './components/WaitlistModal';
-import InfluencerDashboard from './pages/InfluencerDashboard';
-import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
+const Dashboard = React.lazy(() => import('./pages/Dashboard.tsx?v=0545'));
+const Login = React.lazy(() => import('./pages/Login.tsx?v=0545'));
+const InfluencerDashboard = React.lazy(() => import('./pages/InfluencerDashboard.tsx?v=0545'));
 
 const App: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
