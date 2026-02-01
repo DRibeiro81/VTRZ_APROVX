@@ -3,7 +3,8 @@ import {
   Layout, FileText, BarChart3, History, LogOut, Upload, 
   CheckCircle2, AlertCircle, Zap, Search, Target, 
   ArrowRight, Sparkles, ChevronRight, ShieldCheck,
-  Trophy, Clock, Filter, ThumbsUp, ThumbsDown, Globe, BookOpen, Briefcase, Code
+  Trophy, Clock, Filter, ThumbsUp, ThumbsDown, Globe, BookOpen, Briefcase, Code,
+  Eye, FileSearch, Layers, Cpu, Activity, ShieldAlert
 } from 'lucide-react';
 import Logo from '../components/Logo';
 import { supabase } from '../lib/supabaseClient';
@@ -18,10 +19,11 @@ const Dashboard: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
 
   const steps = [
-    "Processando dados...",
-    "Extraindo requisitos...",
-    "IA comparando perfil...",
-    "Gerando indicadores..."
+    "Extraindo Job Description...",
+    "Executando ATS Parsing...",
+    "Mapeando Keywords & Contexto...",
+    "Analisando métricas de impacto...",
+    "Gerando Auditoria Final..."
   ];
 
   const handleLogout = async () => {
@@ -41,237 +43,259 @@ const Dashboard: React.FC = () => {
     setUploadStep(0);
 
     const interval = setInterval(() => {
-      setUploadStep(prev => (prev >= 3 ? 3 : prev + 1));
-    }, 1200);
+      setUploadStep(prev => (prev >= 4 ? 4 : prev + 1));
+    }, 1500);
 
     setTimeout(() => {
-      // Simulação Rígida e Realista baseada na força de cada pilar
       setAnalysisResult({
-        score: jobUrl ? 48 : 59, // Extremamente rígido
-        matchLevel: 'NÃO RECOMENDADO',
-        jobTitle: jobUrl ? 'Cargo de Alta Performance' : 'Análise Executiva de Perfil',
+        // 1. ATS Match Score
+        score: 58,
+        matchClass: 'Competitividade Média',
+        matchLevel: 'Médio Risco',
         analysisDate: new Date().toLocaleDateString(),
-        metrics: [
-          { label: 'Experiência', value: 42, color: '#EF4444', icon: <Briefcase className="w-3 h-3"/>, evaluation: 'Fraca: Descrição passiva e falta de progressão clara.' },
-          { label: 'Conhecimento', value: 58, color: '#F59E0B', icon: <Code className="w-3 h-3"/>, evaluation: 'Regular: Hard skills presentes, mas sem profundidade técnica.' },
-          { label: 'Idiomas', value: 20, color: '#EF4444', icon: <Globe className="w-3 h-3"/>, evaluation: 'Inexistente: Nenhuma proficiência detectada ou comprovada.' },
-          { label: 'Formação', value: 85, color: '#10B981', icon: <BookOpen className="w-3 h-3"/>, evaluation: 'Forte: Base acadêmica sólida e compatível.' }
+        jobTitle: jobUrl ? 'Cargo Alvo Detectado' : 'Perfil Geral Executivo',
+        
+        // Métricas Core (Seção de BI)
+        atsMetrics: [
+          { label: 'Keyword Match Rate', value: 65, status: 'Regular', detail: 'Faltam 4 keywords críticas.' },
+          { label: 'Keyword Placement', value: 40, status: 'Crítico', detail: 'Keywords ausentes no resumo/título.' },
+          { label: 'Keyword Density', value: 'Ideal', status: 'OK', detail: 'Sem indícios de keyword stuffing.', isStatus: true },
+          { label: 'Semantic Skill Match', value: 72, status: 'Bom', detail: 'Skills implícitas reconhecidas.' },
+          { label: 'ATS Parsing & Structure', value: 85, status: 'Forte', detail: 'Layout compatível com leitura.' },
+          { label: 'Quantification Score', value: 20, status: 'Crítico', detail: 'Apenas 1 exp. possui números.' }
         ],
-        criticalGaps: [
-          { type: 'Experiência', msg: 'Falta de métricas quantitativas. Recrutadores descartam currículos sem prova de valor (ex: gerou X lucro, economizou Y tempo).' },
-          { type: 'Idiomas', msg: 'Mercado sênior exige Inglês. A ausência de menção reduz drasticamente o alcance do currículo.' },
-          { type: 'Conhecimento', msg: 'Gap em tecnologias emergentes citadas na descrição da vaga ou padrão de mercado.' }
+
+        // 6. Skill Gaps (Bloqueantes)
+        gaps: [
+          { skill: 'Docker/Kubernetes', severity: 'Crítico', type: 'Bloqueante ATS' },
+          { skill: 'Arquitetura de Microserviços', severity: 'Importante', type: 'Diferencial' },
+          { skill: 'Inglês Avançado', severity: 'Crítico', type: 'Pré-requisito' }
         ],
-        strengths: [
-          "Organização visual e hierarquia de informações aceitável.",
-          "Formação acadêmica em linha com as exigências técnicas.",
-          "Dados de contato e links sociais validados."
+
+        // 8. Content Quality & 12. Risks
+        qualityAlerts: [
+          { type: 'Risk', msg: 'Currículo Genérico: Falta customização para a Job Description.', severity: 'Alta' },
+          { type: 'Content', msg: 'Verbos de ação fracos: "Responsável por" detectado 5 vezes.', severity: 'Média' },
+          { type: 'Parsing', msg: 'Uso de colunas detectado: Risco de leitura truncada em ATS legados.', severity: 'Baixa' }
         ],
-        weaknesses: [
-          "Ausência de Projetos Práticos ou Portfólio demonstrável.",
-          "Resumo Profissional sem palavras-chave estratégicas para ATS.",
-          "Descrições de cargos focadas em tarefas e não em resultados."
-        ],
+
+        // Próximos Passos (Plano de Ação)
         actionPlan: [
-          "Transformar tarefas em conquistas numéricas imediatas.",
-          "Inserir certificações de idiomas ou testes de proficiência.",
-          "Adicionar seção de 'Projetos e Tecnologias' com links clicáveis."
+          "Quantificar resultados: 'Reduzi latência em 30%' em vez de 'Melhorei o sistema'.",
+          "Mover keywords críticas para a seção de 'Resumo Profissional'.",
+          "Adicionar certificações técnicas mencionadas na vaga."
         ]
       });
       setIsUploading(false);
       setCredits(prev => prev - 1);
       clearInterval(interval);
-    }, 6000);
+    }, 7500);
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFDFD] flex font-sans">
-      {/* Sidebar Compacta */}
-      <aside className="w-[240px] bg-[#0F172A] text-white flex flex-col hidden lg:flex sticky top-0 h-screen">
-        <div className="p-8"><Logo /></div>
-        <nav className="flex-grow px-4 space-y-1 mt-4">
-          <button onClick={() => setActiveTab('analyze')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-xs uppercase tracking-widest ${activeTab === 'analyze' ? 'bg-aprovex-blue text-white shadow-lg shadow-blue-500/20' : 'text-slate-400 hover:bg-white/5'}`}><Zap className="w-4 h-4" /> Analisar</button>
-          <button onClick={() => setActiveTab('history')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-xs uppercase tracking-widest ${activeTab === 'history' ? 'bg-aprovex-blue text-white' : 'text-slate-400 hover:bg-white/5'}`}><History className="w-4 h-4" /> Histórico</button>
+    <div className="min-h-screen bg-[#F8FAFC] flex font-sans">
+      {/* Sidebar Corporativa */}
+      <aside className="w-[250px] bg-[#0F172A] text-white flex flex-col hidden lg:flex sticky top-0 h-screen border-r border-slate-800">
+        <div className="p-8 border-b border-white/5"><Logo /></div>
+        <nav className="flex-grow px-4 space-y-1 mt-6">
+          <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-4 ml-4">Auditoria ATS</p>
+          <button onClick={() => setActiveTab('analyze')} className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl font-bold text-[11px] uppercase tracking-widest transition-all ${activeTab === 'analyze' ? 'bg-aprovex-blue text-white shadow-lg shadow-blue-500/20' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}><Activity className="w-4 h-4" /> Nova Auditoria</button>
+          <button onClick={() => setActiveTab('history')} className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl font-bold text-[11px] uppercase tracking-widest transition-all ${activeTab === 'history' ? 'bg-aprovex-blue text-white' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}><History className="w-4 h-4" /> Histórico</button>
         </nav>
-        <div className="p-4 border-t border-white/5">
-          <div className="bg-white/5 rounded-xl p-4 mb-4 border border-white/5">
-            <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Créditos</p>
-            <p className="text-lg font-black text-white">{credits}</p>
+        <div className="p-6">
+          <div className="bg-slate-800/50 rounded-2xl p-4 border border-white/5 mb-4">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[8px] font-black text-slate-400 uppercase">Quota Mensal</span>
+              <span className="text-[8px] font-black text-aprovex-blue bg-blue-500/10 px-1.5 py-0.5 rounded">Premium</span>
+            </div>
+            <p className="text-xl font-black text-white">{credits} <span className="text-[10px] text-slate-500 font-bold tracking-normal uppercase">Créditos</span></p>
           </div>
-          <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 font-bold text-xs hover:text-red-400 transition-all uppercase tracking-widest"><LogOut className="w-4 h-4" /> Sair</button>
+          <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 font-bold text-[10px] hover:text-red-400 transition-all uppercase tracking-widest"><LogOut className="w-4 h-4" /> Logout</button>
         </div>
       </aside>
 
       <main className="flex-grow flex flex-col h-screen overflow-hidden">
-        <header className="h-14 bg-white/80 backdrop-blur-md border-b border-slate-100 flex items-center justify-between px-8 shrink-0 z-30">
+        <header className="h-14 bg-white border-b border-slate-100 flex items-center justify-between px-8 shrink-0 z-30">
           <div className="lg:hidden"><Logo /></div>
-          <div className="flex items-center gap-3 ml-auto">
-            <div className="text-right">
-              <p className="text-[10px] font-black text-slate-800 uppercase tracking-tighter leading-none">Deivid Ribeiro</p>
-              <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Premium</p>
+          <div className="flex items-center gap-4 ml-auto">
+            <div className="text-right flex flex-col justify-center">
+              <p className="text-[10px] font-black text-slate-900 leading-none uppercase">Auditoria Técnica</p>
+              <p className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter mt-0.5">VTRZ-APROVX V2.0</p>
             </div>
-            <div className="w-7 h-7 rounded bg-slate-100 flex items-center justify-center font-black text-slate-500 text-[10px]">DR</div>
+            <div className="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center text-white font-black text-[10px]">DR</div>
           </div>
         </header>
 
-        <div className="flex-grow overflow-y-auto p-6 lg:p-10">
+        <div className="flex-grow overflow-y-auto p-6 lg:p-12">
           {activeTab === 'analyze' && (
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-5xl mx-auto">
               {!analysisResult ? (
                 <div className="flex flex-col items-center">
-                  <div className="text-center mb-8 animate-fade-in">
-                    <h2 className="text-2xl font-black text-slate-900 tracking-tighter mb-1 uppercase">Plataforma de <span className="text-aprovex-blue">Alta Performance</span></h2>
-                    <p className="text-slate-400 font-bold text-[10px] uppercase tracking-[0.2em]">IA treinada em processos seletivos globais.</p>
+                  <div className="text-center mb-10 animate-fade-in">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-900 text-white rounded-full mb-4 text-[9px] font-black uppercase tracking-widest border border-slate-800 shadow-sm">
+                      <Cpu className="w-3 h-3 text-aprovex-blue" /> Engine de Triagem ATS
+                    </div>
+                    <h2 className="text-3xl font-black text-slate-900 tracking-tighter mb-2 uppercase">Módulo de <span className="text-aprovex-blue italic">Avaliação Profissional</span></h2>
+                    <p className="text-slate-400 font-bold text-[10px] uppercase tracking-[0.2em] max-w-sm mx-auto">Análise semântica e estrutural baseada em algoritmos de recrutamento real.</p>
                   </div>
                   
-                  <div className="w-full max-w-lg space-y-4">
-                    <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-sm">
-                      <label className="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Link da Vaga / Empresa Target</label>
+                  <div className="w-full max-w-xl space-y-4">
+                    <div className="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm">
+                      <label className="block text-[9px] font-black text-slate-500 uppercase tracking-widest mb-3 ml-1">Vaga Target (Link LinkedIn/Gupy/Glassdoor)</label>
                       <div className="relative group">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-300 group-focus-within:text-aprovex-blue" />
-                        <input type="url" placeholder="Ex: linkedin.com/jobs/..." className="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:border-aprovex-blue outline-none text-xs font-bold text-slate-700" value={jobUrl} onChange={(e) => setJobUrl(e.target.value)} />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-aprovex-blue" />
+                        <input type="url" placeholder="Cole o link da vaga aqui..." className="w-full pl-11 pr-4 py-4 rounded-2xl border border-slate-200 bg-slate-50/30 focus:bg-white focus:border-aprovex-blue outline-none text-xs font-bold text-slate-700 transition-all" value={jobUrl} onChange={(e) => setJobUrl(e.target.value)} />
                       </div>
                     </div>
 
-                    <div className={`w-full bg-white border-2 border-dashed rounded-[32px] p-10 flex flex-col items-center justify-center transition-all ${isUploading ? 'border-aprovex-blue animate-pulse' : 'border-slate-100 hover:border-slate-200'}`}>
+                    <div className={`w-full bg-white border-2 border-dashed rounded-[40px] p-16 flex flex-col items-center justify-center transition-all ${isUploading ? 'border-aprovex-blue shadow-2xl shadow-blue-500/10' : 'border-slate-200 hover:border-slate-300'}`}>
                       {!isUploading ? (
                         <>
                           <input type="file" id="cv-upload" className="hidden" accept=".pdf" onChange={handleFileChange} />
-                          <label htmlFor="cv-upload" className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mb-4 cursor-pointer hover:bg-aprovex-blue group transition-all shadow-sm"><Upload className="w-5 h-5 text-aprovex-blue group-hover:text-white" /></label>
+                          <label htmlFor="cv-upload" className="w-20 h-20 bg-slate-900 rounded-[24px] flex items-center justify-center mb-6 cursor-pointer hover:scale-105 active:scale-95 transition-all shadow-xl shadow-slate-900/20 group"><Upload className="w-7 h-7 text-white group-hover:text-aprovex-blue transition-colors" /></label>
                           {file ? (
                             <div className="text-center">
-                              <p className="text-xs font-black text-slate-800 uppercase tracking-tighter">{file.name}</p>
-                              <button onClick={startAnalysis} className="mt-6 px-8 py-3 bg-aprovex-blue text-white rounded-xl font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-blue-500/20 active:scale-95 transition-all">Iniciar Auditoria</button>
+                              <p className="text-sm font-black text-slate-900 uppercase tracking-tighter mb-2">{file.name}</p>
+                              <button onClick={startAnalysis} className="px-10 py-5 bg-aprovex-blue text-white rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] shadow-2xl shadow-blue-500/30 active:scale-95 transition-all">Iniciar Auditoria ATS</button>
                             </div>
                           ) : (
                             <div className="text-center">
-                              <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">Upload do Currículo PDF</p>
-                              <p className="text-slate-300 text-[9px] mt-1 italic">Tamanho máx: 5MB</p>
+                              <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em]">Arraste o Currículo (PDF)</p>
+                              <p className="text-slate-300 text-[9px] mt-2 font-bold uppercase">Triagem obrigatória por vaga</p>
                             </div>
                           )}
                         </>
                       ) : (
                         <div className="flex flex-col items-center py-4">
-                          <div className="w-10 h-10 border-[3px] border-aprovex-blue border-t-transparent rounded-full animate-spin mb-4"></div>
-                          <p className="text-[10px] font-black text-slate-800 uppercase tracking-[0.2em] animate-pulse">{steps[uploadStep]}</p>
+                          <div className="relative w-16 h-16 mb-6">
+                            <div className="absolute inset-0 border-[3px] border-slate-100 rounded-full"></div>
+                            <div className="absolute inset-0 border-[3px] border-aprovex-blue border-t-transparent rounded-full animate-spin"></div>
+                            <div className="absolute inset-0 flex items-center justify-center"><Activity className="w-6 h-6 text-aprovex-blue animate-pulse" /></div>
+                          </div>
+                          <p className="text-[10px] font-black text-slate-800 uppercase tracking-[0.3em] animate-pulse">{steps[uploadStep]}</p>
+                          <div className="w-48 h-1 bg-slate-100 rounded-full mt-4 overflow-hidden"><div className="h-full bg-aprovex-blue transition-all duration-500" style={{ width: `${(uploadStep+1)*20}%` }}></div></div>
                         </div>
                       )}
                     </div>
                   </div>
                 </div>
               ) : (
-                <div className="animate-fade-in space-y-6 pb-20">
-                  {/* Dashboard BI Compacto */}
-                  <div className="flex items-center justify-between">
+                <div className="animate-fade-in-up space-y-6 pb-24">
+                  {/* Dashboard Header BI */}
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-8">
                     <div>
-                      <button onClick={() => setAnalysisResult(null)} className="text-[9px] font-black text-slate-400 uppercase tracking-widest hover:text-aprovex-blue flex items-center gap-1 mb-2 transition-all group"><ChevronRight className="w-3 h-3 rotate-180 group-hover:-translate-x-1" /> Voltar ao Painel</button>
-                      <h2 className="text-xl font-black text-slate-900 tracking-tighter leading-none mb-1 uppercase italic">Relatório de <span className="text-aprovex-blue">Performance BI</span></h2>
-                      <div className="flex items-center gap-3 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                        <span className="bg-slate-900 text-white px-2 py-0.5 rounded flex items-center gap-1.5"><Target className="w-3 h-3 text-aprovex-blue" /> Vaga: {analysisResult.jobTitle}</span>
-                        <span>{analysisResult.analysisDate}</span>
+                      <button onClick={() => setAnalysisResult(null)} className="text-[9px] font-black text-slate-400 uppercase tracking-widest hover:text-aprovex-blue flex items-center gap-1.5 mb-3 transition-all group"><ChevronRight className="w-3 h-3 rotate-180 group-hover:-translate-x-1" /> Nova Triagem Técnica</button>
+                      <h2 className="text-2xl font-black text-slate-900 tracking-tighter leading-none mb-2 uppercase">Relatório de <span className="text-aprovex-blue underline underline-offset-4 decoration-2">Auditoria ATS</span></h2>
+                      <div className="flex items-center gap-4 text-[9px] font-black text-slate-500 uppercase tracking-widest">
+                        <span className="flex items-center gap-1.5 bg-slate-900 text-white px-2 py-1 rounded-md"><Target className="w-3.5 h-3.5 text-aprovex-blue" /> Vaga: {analysisResult.jobTitle}</span>
+                        <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> ID: #{Math.floor(Math.random()*90000)}</span>
+                        <span className="flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5" /> Verificado</span>
                       </div>
                     </div>
-                    <button className="px-5 py-2.5 bg-slate-50 border border-slate-200 text-slate-600 rounded-lg font-black text-[9px] uppercase tracking-widest hover:bg-white transition-all shadow-sm">Exportar PDF</button>
+                    <div className="flex gap-2">
+                      <button className="px-6 py-3 bg-white border border-slate-200 text-slate-800 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-sm">Exportar BI</button>
+                      <button className="px-6 py-3 bg-slate-900 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-slate-900/20">Imprimir</button>
+                    </div>
                   </div>
 
                   <div className="grid lg:grid-cols-4 gap-6">
-                    {/* Score Centralizado */}
-                    <div className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm flex flex-col items-center justify-center">
-                      <div className="relative w-28 h-28 flex items-center justify-center mb-4">
+                    {/* 1. ATS Match Score (Global Gauge) */}
+                    <div className="bg-white p-8 rounded-[32px] border border-slate-100 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
+                      <div className="absolute top-0 right-0 p-4 opacity-5"><Activity className="w-20 h-20 text-slate-900" /></div>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-8">ATS Match Score</p>
+                      <div className="relative w-36 h-36 flex items-center justify-center mb-6">
                         <svg className="w-full h-full transform -rotate-90">
-                          <circle cx="56" cy="56" r="50" stroke="#F1F5F9" strokeWidth="10" fill="transparent" />
-                          <circle cx="56" cy="56" r="50" stroke={analysisResult.score > 70 ? '#10B981' : '#EF4444'} strokeWidth="10" fill="transparent" strokeDasharray={314} strokeDashoffset={314 - (314 * analysisResult.score) / 100} strokeLinecap="round" className="transition-all duration-1000" />
+                          <circle cx="72" cy="72" r="66" stroke="#F8FAFC" strokeWidth="12" fill="transparent" />
+                          <circle cx="72" cy="72" r="66" stroke={analysisResult.score > 74 ? '#10B981' : analysisResult.score > 49 ? '#F59E0B' : '#EF4444'} strokeWidth="12" fill="transparent" strokeDasharray={414} strokeDashoffset={414 - (414 * analysisResult.score) / 100} strokeLinecap="round" className="transition-all duration-1000 ease-out" />
                         </svg>
                         <div className="absolute text-center">
-                          <span className="text-3xl font-black text-slate-900 leading-none tracking-tighter">{analysisResult.score}</span>
-                          <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest">Global</p>
+                          <span className="text-5xl font-black text-slate-900 tracking-tighter leading-none">{analysisResult.score}</span>
+                          <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1">Pontos / 100</p>
                         </div>
                       </div>
-                      <span className={`px-4 py-1.5 rounded-lg text-[8px] font-black uppercase tracking-widest ${analysisResult.score > 70 ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>{analysisResult.matchLevel}</span>
+                      <div className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border ${analysisResult.score > 74 ? 'bg-green-50 text-green-600 border-green-100' : analysisResult.score > 49 ? 'bg-amber-50 text-amber-600 border-amber-100' : 'bg-red-50 text-red-600 border-red-100'}`}>
+                        {analysisResult.matchClass}
+                      </div>
                     </div>
 
-                    {/* BI Indicators - Realismo e Força */}
-                    <div className="lg:col-span-3 bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm">
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6">Auditoria de Pilares Estratégicos</p>
-                      <div className="grid md:grid-cols-2 gap-x-8 gap-y-5">
-                        {analysisResult.metrics.map((m: any, i: number) => (
-                          <div key={i} className="space-y-1.5 group">
+                    {/* 2-5, 7, 9. Módulos de Auditoria (Grid 3 colunas) */}
+                    <div className="lg:col-span-3 bg-white p-8 rounded-[32px] border border-slate-100 shadow-sm">
+                      <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-50">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Indicadores de Performance Técnica</p>
+                        <span className="text-[9px] font-bold text-slate-300 italic">Pesos baseados em algoritmos padrão mercado</span>
+                      </div>
+                      <div className="grid md:grid-cols-2 gap-x-12 gap-y-6">
+                        {analysisResult.atsMetrics.map((m: any, i: number) => (
+                          <div key={i} className="space-y-2 group">
                             <div className="flex justify-between items-end">
-                              <span className="text-[9px] font-bold text-slate-600 flex items-center gap-1.5 uppercase tracking-tighter">{m.icon} {m.label}</span>
-                              <span className="text-[10px] font-black text-slate-900">{m.value}%</span>
+                              <span className="text-[10px] font-black text-slate-600 uppercase tracking-tight">{m.label}</span>
+                              <span className={`text-[10px] font-black ${m.status === 'OK' || m.status === 'Forte' ? 'text-green-500' : m.status === 'Regular' ? 'text-amber-500' : 'text-red-500'}`}>{m.isStatus ? m.value : `${m.value}%`}</span>
                             </div>
                             <div className="h-1.5 w-full bg-slate-50 rounded-full overflow-hidden border border-slate-100">
-                              <div className="h-full transition-all duration-1000" style={{ width: `${m.value}%`, backgroundColor: m.color }} />
+                              <div className="h-full transition-all duration-1000 ease-out" style={{ width: m.isStatus ? '100%' : `${m.value}%`, backgroundColor: m.color || (m.status === 'Forte' || m.status === 'OK' ? '#10B981' : m.status === 'Regular' ? '#F59E0B' : '#EF4444') }} />
                             </div>
-                            <p className="text-[8px] text-slate-400 font-medium leading-none group-hover:text-slate-500 transition-colors">{m.evaluation}</p>
+                            <div className="flex items-center gap-1.5">
+                              <div className={`w-1 h-1 rounded-full ${m.status === 'OK' || m.status === 'Forte' ? 'bg-green-500' : m.status === 'Regular' ? 'bg-amber-500' : 'bg-red-500'}`} />
+                              <p className="text-[9px] text-slate-400 font-bold group-hover:text-slate-600 transition-colors uppercase tracking-tighter">{m.detail}</p>
+                            </div>
                           </div>
                         ))}
                       </div>
                     </div>
 
-                    {/* Detalhamento de Gargalos BI */}
-                    <div className="lg:col-span-4 grid md:grid-cols-2 gap-6">
-                      <div className="bg-white border border-slate-100 rounded-[24px] shadow-sm overflow-hidden flex flex-col">
-                        <div className="bg-slate-50 px-5 py-3 border-b border-slate-100 flex items-center gap-2">
-                          <ThumbsUp className="w-3 h-3 text-green-500" />
-                          <span className="text-[9px] font-black text-slate-700 uppercase tracking-widest">Pontos de Força</span>
-                        </div>
-                        <div className="p-5 flex-grow">
-                          <ul className="space-y-4">
-                            {analysisResult.strengths.map((s: string, i: number) => (
-                              <li key={i} className="text-[10px] font-bold text-slate-600 leading-snug flex gap-3">
-                                <span className="text-green-400">✓</span> {s}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
+                    {/* 6. Skill Gap Score (O que falta) */}
+                    <div className="lg:col-span-2 bg-white border border-slate-100 rounded-[32px] shadow-sm overflow-hidden">
+                      <div className="bg-slate-900 px-6 py-4 flex items-center justify-between">
+                        <span className="text-[10px] font-black text-white uppercase tracking-widest flex items-center gap-2"><Layers className="w-3.5 h-3.5 text-aprovex-blue" /> Skill Gap Score</span>
+                        <span className="text-[9px] font-black text-red-400 uppercase tracking-widest">{analysisResult.gaps.length} Gaps Críticos</span>
                       </div>
-
-                      <div className="bg-white border border-slate-100 rounded-[24px] shadow-sm overflow-hidden flex flex-col">
-                        <div className="bg-slate-50 px-5 py-3 border-b border-slate-100 flex items-center gap-2">
-                          <ThumbsDown className="w-3 h-3 text-red-500" />
-                          <span className="text-[9px] font-black text-slate-700 uppercase tracking-widest">Gargalos de Reprovação</span>
-                        </div>
-                        <div className="p-5 flex-grow">
-                          <ul className="space-y-4">
-                            {analysisResult.weaknesses.map((s: string, i: number) => (
-                              <li key={i} className="text-[10px] font-bold text-slate-700 leading-snug flex gap-3">
-                                <span className="text-red-500">✕</span> {s}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Alertas Críticos de IA */}
-                    <div className="lg:col-span-4 bg-red-50/50 p-6 rounded-[24px] border border-red-100">
-                      <p className="text-[9px] font-black text-red-500 uppercase tracking-widest mb-4 flex items-center gap-2"><AlertCircle className="w-3 h-3" /> Alertas Críticos de Auditoria</p>
-                      <div className="space-y-3">
-                        {analysisResult.criticalGaps.map((gap: any, i: number) => (
-                          <div key={i} className="bg-white p-3 rounded-xl border border-red-100 flex gap-3">
-                            <span className="text-[8px] font-black text-red-500 uppercase tracking-tighter bg-red-50 px-1.5 py-0.5 rounded h-fit">{gap.type}</span>
-                            <p className="text-[10px] font-bold text-slate-600 leading-tight">{gap.msg}</p>
+                      <div className="p-6 space-y-4">
+                        {analysisResult.gaps.map((gap: any, i: number) => (
+                          <div key={i} className="flex flex-col gap-1 p-3 bg-slate-50 rounded-xl border border-slate-100 group hover:border-red-100 transition-all">
+                            <div className="flex justify-between items-center">
+                              <span className="text-[11px] font-black text-slate-800">{gap.skill}</span>
+                              <span className={`text-[8px] font-black px-1.5 py-0.5 rounded ${gap.severity === 'Crítico' ? 'bg-red-500 text-white' : 'bg-amber-500 text-white'}`}>{gap.severity}</span>
+                            </div>
+                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter italic">{gap.type}</p>
                           </div>
                         ))}
                       </div>
                     </div>
 
-                    {/* Action Plan Strategy */}
-                    <div className="lg:col-span-4 bg-[#0F172A] p-6 rounded-[24px] group overflow-hidden relative">
-                      <div className="absolute top-0 right-0 p-2 opacity-5"><BarChart3 className="w-24 h-24 text-white" /></div>
+                    {/* 8, 12. Risks & Content Quality */}
+                    <div className="lg:col-span-2 bg-white border border-slate-100 rounded-[32px] shadow-sm overflow-hidden">
+                      <div className="bg-slate-50 px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                        <span className="text-[10px] font-black text-slate-700 uppercase tracking-widest flex items-center gap-2"><ShieldAlert className="w-3.5 h-3.5 text-red-500" /> Riscos & Conteúdo</span>
+                      </div>
+                      <div className="p-6 space-y-5">
+                        {analysisResult.qualityAlerts.map((alert: any, i: number) => (
+                          <div key={i} className="flex gap-3">
+                            <div className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${alert.severity === 'Alta' ? 'bg-red-500 animate-pulse' : alert.severity === 'Média' ? 'bg-amber-500' : 'bg-blue-500'}`} />
+                            <div className="space-y-0.5">
+                              <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">{alert.type}</p>
+                              <p className="text-[10px] font-bold text-slate-600 leading-snug">{alert.msg}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Plano de Ação Estratégico */}
+                    <div className="lg:col-span-4 bg-slate-900 p-8 rounded-[40px] relative group overflow-hidden">
+                      <div className="absolute -bottom-10 -right-10 opacity-5 group-hover:opacity-10 transition-opacity"><Zap className="w-40 h-40 text-white" /></div>
                       <div className="relative z-10">
-                        <p className="text-[9px] font-black text-aprovex-blue uppercase tracking-[0.2em] mb-4 flex items-center gap-2"><Briefcase className="w-3.5 h-3.5" /> Plano de Retomada de Performance</p>
-                        <div className="grid md:grid-cols-3 gap-4">
+                        <h4 className="text-[11px] font-black text-aprovex-blue uppercase tracking-[0.3em] mb-8 flex items-center gap-2"><Sparkles className="w-4 h-4" /> Plano de Retomada de Performance</h4>
+                        <div className="grid md:grid-cols-3 gap-8">
                           {analysisResult.actionPlan.map((p: string, i: number) => (
-                            <div key={i} className="flex flex-col gap-1.5 p-3 bg-white/5 rounded-xl border border-white/5">
-                              <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest tracking-tighter tracking-widest tracking-tighter tracking-widest tracking-tighter">Etapa 0{i+1}</span>
-                              <p className="text-[10px] font-medium text-slate-300 leading-snug">{p}</p>
+                            <div key={i} className="space-y-3 p-5 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all">
+                              <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-700 pb-1">Etapa 0{i+1}</span>
+                              <p className="text-[11px] font-medium text-slate-300 leading-relaxed">{p}</p>
                             </div>
                           ))}
                         </div>
                       </div>
                     </div>
+
                   </div>
                 </div>
               )}
@@ -280,10 +304,13 @@ const Dashboard: React.FC = () => {
           
           {activeTab === 'history' && (
             <div className="max-w-4xl mx-auto">
-              <h2 className="text-xl font-black text-slate-900 tracking-tighter mb-8 uppercase italic">Arquivo de <span className="text-aprovex-blue">Triagens</span></h2>
-              <div className="bg-white rounded-[24px] border border-slate-100 shadow-sm p-16 flex flex-col items-center justify-center text-center opacity-50">
-                <History className="w-6 h-6 text-slate-200 mb-4" />
-                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Nenhuma análise arquivada.</p>
+              <h2 className="text-xl font-black text-slate-900 tracking-tighter mb-8 uppercase italic border-b border-slate-100 pb-4">Log de <span className="text-aprovex-blue italic">Auditorias</span></h2>
+              <div className="bg-white rounded-[32px] border border-slate-100 shadow-sm p-20 flex flex-col items-center justify-center text-center">
+                <div className="w-16 h-16 bg-slate-50 rounded-[20px] flex items-center justify-center mb-6">
+                  <FileSearch className="w-6 h-6 text-slate-200" />
+                </div>
+                <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest mb-1">Nenhum registro encontrado</h3>
+                <p className="text-slate-400 text-[10px] font-bold uppercase tracking-tighter">Inicie uma auditoria para gerar seu histórico de BI.</p>
               </div>
             </div>
           )}
