@@ -51,25 +51,26 @@ const Dashboard: React.FC = () => {
         jobTitle: jobUrl ? 'Desenvolvedor Full Stack Sênior' : 'Avaliação de Perfil Geral',
         analysisDate: new Date().toLocaleDateString(),
         metrics: [
-          { label: 'Aderência à Vaga', value: jobUrl ? 35 : 45, color: '#EF4444' },
-          { label: 'Densidade de Keywords', value: 42, color: '#EF4444' },
-          { label: 'Escaneabilidade ATS', value: 58, color: '#F59E0B' },
-          { label: 'Prova de Resultado', value: 20, color: '#EF4444' }
+          { label: 'Experiência', value: 45, color: '#EF4444' },
+          { label: 'Conhecimento', value: 55, color: '#F59E0B' },
+          { label: 'Idiomas', value: 30, color: '#EF4444' },
+          { label: 'Formação', value: 90, color: '#10B981' },
+          { label: 'Projetos', value: 20, color: '#EF4444' }
         ],
         strengths: [
-          "Informações de contato e links sociais bem localizados.",
-          "Formação acadêmica relevante para o cargo pretendido.",
-          "Arquivo em formato PDF legível por OCR básico."
+          "Documento formatado em PDF e legível por software.",
+          "Dados de contato e LinkedIn presentes e bem localizados.",
+          "Formação acadêmica em instituição reconhecida."
         ],
         weaknesses: [
-          "CRÍTICO: O currículo descreve 'responsabilidades' e não 'conquistas'. Ausência de métricas reduz sua nota em 70%.",
-          "LAYOUT: O uso de elementos gráficos/colunas confunde algoritmos ATS modernos, gerando dados truncados.",
-          "DÉFICIT TÉCNICO: Falta de menção a ferramentas obrigatórias (Docker, CI/CD, AWS) para o nível de sênior esperado."
+          "DÉFICIT DE EXPERIÊNCIA: Falta de descrição orientada a resultados reais.",
+          "GAP DE CONHECIMENTO: Ausência de termos técnicos vitais para a vaga pretendida.",
+          "IDIOMAS: Nível não especificado ou abaixo do requerido para ambiente global."
         ],
         actionPlan: [
-          "Reestruturar cada experiência focando na fórmula: 'Fiz [X] medido por [Y] que resultou em [Z]'.",
-          "Migrar para um layout de coluna única padrão Google/Amazon.",
-          "Inserir seção de Habilidades Técnicas com palavras-chave exatas da descrição da vaga."
+          "Quantificar experiências: 'Melhorei performance em X%' em vez de 'Fiz X'.",
+          "Adicionar certificações de proficiência em idiomas (Inglês/Espanhol).",
+          "Inserir seção de Projetos Práticos com evidência técnica (GitHub/Portfólio)."
         ]
       });
       setIsUploading(false);
@@ -164,75 +165,91 @@ const Dashboard: React.FC = () => {
                     <button className="px-5 py-3 bg-slate-900 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-blue-500/10 hover:bg-aprovex-blue transition-all">Exportar PDF</button>
                   </div>
 
-                  <div className="grid lg:grid-cols-3 gap-6">
-                    {/* Score Compact */}
+                  <div className="grid lg:grid-cols-4 gap-6">
+                    {/* Score Gauge - Mais BI */}
                     <div className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm flex flex-col items-center justify-center">
-                      <div className="relative w-32 h-32 flex items-center justify-center mb-4">
+                      <div className="relative w-36 h-36 flex items-center justify-center mb-4">
                         <svg className="w-full h-full transform -rotate-90">
-                          <circle cx="64" cy="64" r="58" stroke="#F1F5F9" strokeWidth="12" fill="transparent" />
-                          <circle cx="64" cy="64" r="58" stroke={analysisResult.score > 70 ? '#10B981' : '#EF4444'} strokeWidth="12" fill="transparent" strokeDasharray={364} strokeDashoffset={364 - (364 * analysisResult.score) / 100} strokeLinecap="round" className="transition-all duration-1000" />
+                          <circle cx="72" cy="72" r="64" stroke="#F1F5F9" strokeWidth="12" fill="transparent" />
+                          <circle cx="72" cy="72" r="64" stroke={analysisResult.score > 70 ? '#10B981' : '#EF4444'} strokeWidth="12" fill="transparent" strokeDasharray={402} strokeDashoffset={402 - (402 * analysisResult.score) / 100} strokeLinecap="round" className="transition-all duration-1000" />
                         </svg>
                         <div className="absolute text-center">
-                          <span className="text-4xl font-black text-slate-900 leading-none tracking-tighter">{analysisResult.score}</span>
-                          <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Score</p>
+                          <span className="text-4xl font-black text-slate-900 tracking-tighter">{analysisResult.score}</span>
+                          <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Score Geral</p>
                         </div>
                       </div>
                       <span className={`px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest ${analysisResult.score > 70 ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>{analysisResult.matchLevel}</span>
                     </div>
 
-                    {/* Quick Metrics */}
-                    <div className="lg:col-span-2 bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm space-y-4">
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Indicadores Técnicos</p>
-                      {analysisResult.metrics.map((m: any, i: number) => (
-                        <div key={i} className="space-y-1.5">
-                          <div className="flex justify-between items-end"><span className="text-[10px] font-bold text-slate-700">{m.label}</span><span className="text-[10px] font-black">{m.value}%</span></div>
-                          <div className="h-1.5 w-full bg-slate-50 rounded-full overflow-hidden border border-slate-100"><div className="h-full transition-all duration-1000 delay-300" style={{ width: `${m.value}%`, backgroundColor: m.color }} /></div>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Strengths & Weaknesses (Compact Cards) */}
-                    <div className="lg:col-span-3 grid md:grid-cols-2 gap-4">
-                      <div className="bg-green-50/50 p-5 rounded-[24px] border border-green-100">
-                        <p className="text-[9px] font-black text-green-600 uppercase tracking-widest mb-4 flex items-center gap-2"><ThumbsUp className="w-3.5 h-3.5" /> Pontos Fortes</p>
-                        <ul className="space-y-3">
-                          {analysisResult.strengths.map((s: string, i: number) => (
-                            <li key={i} className="text-[11px] font-bold text-slate-700 leading-snug flex gap-2">
-                              <span className="text-green-500">•</span> {s}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                      <div className="bg-red-50/50 p-5 rounded-[24px] border border-red-100">
-                        <p className="text-[9px] font-black text-red-600 uppercase tracking-widest mb-4 flex items-center gap-2"><ThumbsDown className="w-3.5 h-3.5" /> Pontos Fracos</p>
-                        <ul className="space-y-3">
-                          {analysisResult.weaknesses.map((s: string, i: number) => (
-                            <li key={i} className="text-[11px] font-bold text-slate-700 leading-snug flex gap-2">
-                              <span className="text-red-400">•</span> {s}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-
-                    {/* Action Plan (Full Width Bottom) */}
-                    <div className="lg:col-span-3 bg-slate-900 p-6 rounded-[24px] flex items-center justify-between">
-                      <div className="flex gap-6">
-                        <div>
-                          <p className="text-[9px] font-black text-aprovex-blue uppercase tracking-widest mb-2 flex items-center gap-2"><Sparkles className="w-3.5 h-3.5" /> Próximos Passos</p>
-                          <div className="flex gap-4">
-                            {analysisResult.actionPlan.map((p: string, i: number) => (
-                              <div key={i} className="flex items-center gap-2 bg-white/5 px-3 py-2 rounded-lg border border-white/5">
-                                <span className="text-[10px] font-black text-white">{i+1}</span>
-                                <p className="text-[10px] font-medium text-slate-400">{p}</p>
-                              </div>
-                            ))}
+                    {/* BI Indicators - Vertical & Precise */}
+                    <div className="lg:col-span-3 bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm">
+                      <div className="grid grid-cols-2 gap-x-10 gap-y-6">
+                        {analysisResult.metrics.map((m: any, i: number) => (
+                          <div key={i} className="space-y-2">
+                            <div className="flex justify-between items-end">
+                              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{m.label}</span>
+                              <span className="text-[11px] font-black text-slate-900">{m.value}%</span>
+                            </div>
+                            <div className="h-1.5 w-full bg-slate-50 rounded-full overflow-hidden border border-slate-100">
+                              <div className="h-full transition-all duration-1000" style={{ width: `${m.value}%`, backgroundColor: m.color }} />
+                            </div>
                           </div>
-                        </div>
+                        ))}
                       </div>
-                      <ArrowRight className="w-5 h-5 text-white/20" />
                     </div>
 
+                    {/* BI Columns: Strengths vs Weaknesses */}
+                    <div className="lg:col-span-2 bg-white border border-slate-100 rounded-[24px] shadow-sm overflow-hidden flex flex-col">
+                      <div className="bg-slate-50 px-5 py-3 border-b border-slate-100 flex items-center gap-2">
+                        <ThumbsUp className="w-3.5 h-3.5 text-green-500" />
+                        <span className="text-[10px] font-black text-slate-700 uppercase tracking-widest">Pontos de Destaque</span>
+                      </div>
+                      <div className="p-5 flex-grow">
+                        <ul className="space-y-4">
+                          {analysisResult.strengths.map((s: string, i: number) => (
+                            <li key={i} className="text-[11px] font-medium text-slate-600 leading-snug flex gap-3">
+                              <span className="text-green-400 font-black tracking-tighter">OK</span>
+                              {s}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+
+                    <div className="lg:col-span-2 bg-white border border-slate-100 rounded-[24px] shadow-sm overflow-hidden flex flex-col">
+                      <div className="bg-slate-50 px-5 py-3 border-b border-slate-100 flex items-center gap-2">
+                        <ThumbsDown className="w-3.5 h-3.5 text-red-500" />
+                        <span className="text-[10px] font-black text-slate-700 uppercase tracking-widest">Gargalos Críticos</span>
+                      </div>
+                      <div className="p-5 flex-grow">
+                        <ul className="space-y-4">
+                          {analysisResult.weaknesses.map((s: string, i: number) => (
+                            <li key={i} className="text-[11px] font-bold text-slate-700 leading-snug flex gap-3">
+                              <span className="text-red-500 font-black tracking-tighter">!!</span>
+                              {s}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+
+                    {/* Action Plan BI Bar */}
+                    <div className="lg:col-span-4 bg-[#0F172A] p-6 rounded-[24px] flex items-center justify-between group overflow-hidden relative">
+                      <div className="absolute top-0 right-0 p-2 opacity-5 group-hover:opacity-10 transition-opacity">
+                        <BarChart3 className="w-32 h-32 text-white" />
+                      </div>
+                      <div className="relative z-10 w-full">
+                        <p className="text-[9px] font-black text-aprovex-blue uppercase tracking-[0.3em] mb-4">Estratégia de Correção (Action Plan)</p>
+                        <div className="grid md:grid-cols-3 gap-6">
+                          {analysisResult.actionPlan.map((p: string, i: number) => (
+                            <div key={i} className="flex flex-col gap-2">
+                              <span className="text-[10px] font-black text-slate-500">PASSO 0{i+1}</span>
+                              <p className="text-[11px] font-medium text-slate-300 leading-snug">{p}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
