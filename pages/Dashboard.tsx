@@ -4,10 +4,24 @@ import {
   CheckCircle2, AlertCircle, Zap, Search, Target, 
   ArrowRight, Sparkles, ChevronRight, ShieldCheck,
   Trophy, Clock, Filter, ThumbsUp, ThumbsDown, Globe, BookOpen, Briefcase, Code,
-  Eye, FileSearch, Layers, Cpu, Activity, ShieldAlert
+  Eye, FileSearch, Layers, Cpu, Activity, ShieldAlert, X, Download, Info
 } from 'lucide-react';
 import Logo from '../components/Logo';
 import { supabase } from '../lib/supabaseClient';
+
+// Definições de cenário ideal para o Modal
+const IDEAL_SCENARIOS: Record<string, string> = {
+  'Cobertura de Palavras-chave': 'O cenário ideal é atingir 80% ou mais de correspondência. Você deve incluir termos técnicos e "soft skills" exatamente como descritos na vaga.',
+  'Posicionamento Estratégico': 'As palavras-chave vitais devem aparecer no Título Profissional e no Resumo. O ATS prioriza termos encontrados no topo do documento.',
+  'Densidade de Palavras': 'A densidade ideal é entre 2% e 4% por termo. Menos que isso é irrelevante; mais que isso é considerado "keyword stuffing" e causa rejeição.',
+  'Compatibilidade Semântica': 'O sistema deve reconhecer que você possui a habilidade mesmo sem usar o termo exato. Ex: "Desenvolvimento de Interfaces" é semanticamente próximo a "Frontend".',
+  'Qualidade de Leitura (Parsing)': 'O documento deve ser coluna única, sem tabelas complexas ou gráficos. O texto deve ser selecionável e em fontes padrão.',
+  'Qualidade do Conteúdo': 'Utilize verbos de ação fortes (Gerenciei, Desenvolvi, Reduzi) e evite clichês como "apaixonado por tecnologia".',
+  'Score de Quantificação': 'Cada experiência deve conter pelo menos uma métrica numérica. Ex: "Aumento de 15% em vendas" ou "Redução de 2h no processo".',
+  'Relevância da Experiência': 'Suas últimas duas experiências devem ter pelo menos 70% de similaridade técnica com as responsabilidades do cargo pretendido.',
+  'Nível de Personalização': 'O currículo não deve parecer um modelo padrão. Ele deve citar tecnologias e desafios específicos mencionados na Job Description.',
+  'Risco de Rejeição (ATS)': 'O cenário ideal é risco ZERO. Evite informações excessivamente pessoais, fotos ou layouts criativos demais que confundem o robô.'
+};
 
 const Dashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('analyze');
@@ -16,7 +30,10 @@ const Dashboard: React.FC = () => {
   const [uploadStep, setUploadStep] = useState(0);
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [jobUrl, setJobUrl] = useState('');
+  const [isImporting, setIsImporting] = useState(false);
+  const [importedJobTitle, setImportedJobTitle] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
+  const [modalMetric, setModalMetric] = useState<string | null>(null);
 
   const steps = [
     "Acessando Job Description...",
@@ -37,6 +54,16 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const handleImportJob = () => {
+    if (!jobUrl) return;
+    setIsImporting(true);
+    // Simulação de extração de dados da URL
+    setTimeout(() => {
+      setImportedJobTitle("Desenvolvedor Full Stack Sênior @ Empresa Tech");
+      setIsImporting(false);
+    }, 1500);
+  };
+
   const startAnalysis = async () => {
     if (!file) return;
     setIsUploading(true);
@@ -47,43 +74,38 @@ const Dashboard: React.FC = () => {
     }, 1500);
 
     setTimeout(() => {
-      // AUDITORIA REALISTA E RÍGIDA: Foco em reprovação por falta de dados básicos
       setAnalysisResult({
-        score: jobUrl ? 32 : 44, // Score baixo devido a falhas críticas
+        score: jobUrl ? 32 : 44,
         matchClass: 'Alto Risco de Reprovação',
         matchLevel: 'CRÍTICO',
+        verdict: "SUBMETER AGORA É PERDA DE TEMPO. Seu currículo será descartado em milissegundos pelo robô. Você não possui os requisitos mínimos de formação e palavras-chave que o algoritmo busca. Ajuste os bloqueantes antes de tentar.",
         analysisDate: new Date().toLocaleDateString(),
-        jobTitle: jobUrl ? 'Cargo Alvo Detectado' : 'Avaliação Técnica de Perfil',
+        jobTitle: importedJobTitle || 'Avaliação Técnica de Perfil',
         
         atsMetrics: [
           { label: 'Cobertura de Palavras-chave', value: 25, status: 'Crítico', detail: 'Baixa presença de termos da vaga.' },
           { label: 'Posicionamento Estratégico', value: 10, status: 'Crítico', detail: 'Keywords ausentes em seções nobres.' },
-          { label: 'Densidade de Palavras', value: 'Baixa', status: 'Incompleto', detail: 'Frequência insuficiente.', isStatus: true },
+          { label: 'Densidade de Palavras', value: 'Baixa', status: 'Incompleto', detail: 'Abaixo do limiar de relevância.', isStatus: true },
           { label: 'Compatibilidade Semântica', value: 30, status: 'Pobre', detail: 'Baixa correlação contextual.' },
-          { label: 'Qualidade de Leitura (Parsing)', value: 45, status: 'Regular', detail: 'Estrutura básica reconhecida.' },
+          { label: 'Qualidade de Leitura (Parsing)', value: 45, status: 'Regular', detail: 'Layout legível, mas sem dados.' },
           { label: 'Qualidade do Conteúdo', value: 20, status: 'Crítico', detail: 'Linguagem passiva e genérica.' },
-          { label: 'Score de Quantificação', value: 0, status: 'Nulo', detail: 'Ausência de métricas e números.' },
-          { label: 'Relevância da Experiência', value: 35, status: 'Pobre', detail: 'Contexto profissional insuficiente.' },
+          { label: 'Score de Quantificação', value: 0, status: 'Nulo', detail: 'Sem métricas ou números.' },
+          { label: 'Relevância da Experiência', value: 35, status: 'Pobre', detail: 'Experiência não sustenta nível.' },
           { label: 'Nível de Personalização', value: 5, status: 'Crítico', detail: 'Currículo 100% genérico.' },
-          { label: 'Risco de Rejeição (ATS)', value: 85, status: 'Crítico', detail: 'Alta probabilidade de descarte.', isRisk: true }
+          { label: 'Risco de Rejeição (ATS)', value: 85, status: 'Crítico', detail: 'Altíssimo risco de descarte.', isRisk: true }
         ],
-
         gaps: [
           { skill: 'Formação Acadêmica / Graduação', severity: 'Bloqueante', type: 'Falta Requisito Básico' },
-          { skill: 'Hard Skills da Vaga', severity: 'Crítico', type: 'Déficit Técnico' },
-          { skill: 'Resultados Quantificáveis', severity: 'Crítico', type: 'Falta Prova de Valor' }
+          { skill: 'Inglês Corporativo', severity: 'Bloqueante', type: 'Não Detectado' }
         ],
-
         qualityAlerts: [
           { type: 'Risk', msg: 'REJEIÇÃO: Ausência de formação superior detectada para a vaga.', severity: 'Alta' },
-          { type: 'Data', msg: 'DADOS INSUFICIENTES: Currículo sem corpo de texto relevante.', severity: 'Alta' },
-          { type: 'Content', msg: 'Verbos Fracos: Linguagem passiva reduz autoridade.', severity: 'Média' }
+          { type: 'Data', msg: 'DADOS INSUFICIENTES: Currículo vazio de conquistas.', severity: 'Alta' }
         ],
-
         actionPlan: [
-          "URGENTE: Inserir Graduação ou Curso Técnico Profissionalizante.",
-          "Substituir descrições por resultados (ex: 'Fiz X' por 'Gerei Y de lucro').",
-          "Customizar o resumo com as keywords exatas da Job Description."
+          "URGENTE: Inserir Graduação ou Curso Técnico.",
+          "Quantificar resultados numéricos nas experiências.",
+          "Mapear keywords obrigatórias da vaga."
         ]
       });
       setIsUploading(false);
@@ -93,7 +115,30 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex font-sans">
+    <div className="min-h-screen bg-[#F8FAFC] flex font-sans relative">
+      
+      {/* MODAL DE EXPLICAÇÃO DA MÉTRICA */}
+      {modalMetric && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white w-full max-w-md rounded-[32px] p-8 shadow-2xl border border-slate-100 animate-scale-up">
+            <div className="flex justify-between items-center mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-aprovex-blue">
+                  <Info className="w-5 h-5" />
+                </div>
+                <h3 className="text-lg font-black text-slate-900 uppercase tracking-tighter">{modalMetric}</h3>
+              </div>
+              <button onClick={() => setModalMetric(null)} className="p-2 hover:bg-slate-50 rounded-full transition-colors"><X className="w-5 h-5 text-slate-400" /></button>
+            </div>
+            <p className="text-slate-500 font-bold text-[10px] uppercase tracking-widest mb-2">Cenário Ideal para Aprovação</p>
+            <p className="text-slate-600 text-sm leading-relaxed font-medium mb-8">
+              {IDEAL_SCENARIOS[modalMetric] || "Informação indisponível para esta métrica."}
+            </p>
+            <button onClick={() => setModalMetric(null)} className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-aprovex-blue transition-all">Entendido</button>
+          </div>
+        </div>
+      )}
+
       <aside className="w-[250px] bg-[#0F172A] text-white flex flex-col hidden lg:flex sticky top-0 h-screen border-r border-slate-800">
         <div className="p-8 border-b border-white/5"><Logo /></div>
         <nav className="flex-grow px-4 space-y-1 mt-6">
@@ -103,11 +148,8 @@ const Dashboard: React.FC = () => {
         </nav>
         <div className="p-6">
           <div className="bg-slate-800/50 rounded-2xl p-4 border border-white/5 mb-4">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-[8px] font-black text-slate-400 uppercase">Status do Plano</span>
-              <span className="text-[8px] font-black text-aprovex-blue bg-blue-500/10 px-1.5 py-0.5 rounded">Premium</span>
-            </div>
-            <p className="text-xl font-black text-white">{credits} <span className="text-[10px] text-slate-500 font-bold tracking-normal uppercase">Créditos</span></p>
+            <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Créditos</p>
+            <p className="text-xl font-black text-white">{credits}</p>
           </div>
           <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 font-bold text-[10px] hover:text-red-400 transition-all uppercase tracking-widest"><LogOut className="w-4 h-4" /> Sair</button>
         </div>
@@ -119,9 +161,9 @@ const Dashboard: React.FC = () => {
           <div className="flex items-center gap-4 ml-auto">
             <div className="text-right">
               <p className="text-[10px] font-black text-slate-900 uppercase">Auditoria Técnica</p>
-              <p className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter mt-0.5">VTRZ-APROVX V2.0</p>
+              <p className="text-[8px] font-bold text-slate-400 mt-0.5">VTRZ-APROVX V2.0</p>
             </div>
-            <div className="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center text-white font-black text-[10px]">DR</div>
+            <div className="w-8 h-8 rounded bg-slate-900 flex items-center justify-center text-white font-black text-[10px]">DR</div>
           </div>
         </header>
 
@@ -131,27 +173,37 @@ const Dashboard: React.FC = () => {
               {!analysisResult ? (
                 <div className="flex flex-col items-center">
                   <div className="text-center mb-10 animate-fade-in">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-900 text-white rounded-full mb-4 text-[9px] font-black uppercase tracking-widest border border-slate-800">
-                      <Cpu className="w-3 h-3 text-aprovex-blue" /> Engine de Triagem ATS
-                    </div>
                     <h2 className="text-3xl font-black text-slate-900 tracking-tighter mb-2 uppercase italic">Módulo de <span className="text-aprovex-blue">Avaliação Profissional</span></h2>
                     <p className="text-slate-400 font-bold text-[10px] uppercase tracking-[0.2em] max-w-sm mx-auto leading-relaxed">Diagnóstico semântico baseado em algoritmos de recrutamento real.</p>
                   </div>
                   
-                  <div className="w-full max-w-xl space-y-4">
+                  <div className="w-full max-w-lg space-y-4">
                     <div className="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm">
                       <label className="block text-[9px] font-black text-slate-500 uppercase tracking-widest mb-3 ml-1">Link da Vaga / Empresa Target</label>
-                      <div className="relative group">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-aprovex-blue" />
-                        <input type="url" placeholder="linkedin.com/jobs/..." className="w-full pl-11 pr-4 py-4 rounded-2xl border border-slate-200 bg-slate-50/30 focus:bg-white focus:border-aprovex-blue outline-none text-xs font-bold text-slate-700 transition-all" value={jobUrl} onChange={(e) => setJobUrl(e.target.value)} />
+                      <div className="flex gap-2">
+                        <div className="relative group flex-grow">
+                          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-aprovex-blue" />
+                          <input type="url" placeholder="linkedin.com/jobs/..." className="w-full pl-11 pr-4 py-4 rounded-2xl border border-slate-200 bg-slate-50/30 focus:bg-white focus:border-aprovex-blue outline-none text-xs font-bold text-slate-700 transition-all" value={jobUrl} onChange={(e) => setJobUrl(e.target.value)} />
+                        </div>
+                        <button onClick={handleImportJob} disabled={!jobUrl || isImporting} className="px-6 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-aprovex-blue disabled:opacity-50 transition-all flex items-center justify-center min-w-[140px]">
+                          {isImporting ? 'Importando...' : 'Importar Dados'}
+                        </button>
                       </div>
+                      
+                      {importedJobTitle && (
+                        <div className="mt-4 p-3 bg-blue-50 border border-blue-100 rounded-xl flex items-center gap-3 animate-fade-in">
+                          <div className="w-2 h-2 bg-aprovex-blue rounded-full animate-pulse" />
+                          <p className="text-[10px] font-black text-slate-700 uppercase tracking-tight truncate">Vaga Identificada: {importedJobTitle}</p>
+                          <button onClick={() => setImportedJobTitle(null)} className="ml-auto"><X className="w-3.5 h-3.5 text-slate-400 hover:text-red-500" /></button>
+                        </div>
+                      )}
                     </div>
 
-                    <div className={`w-full bg-white border-2 border-dashed rounded-[40px] p-16 flex flex-col items-center justify-center transition-all ${isUploading ? 'border-aprovex-blue shadow-2xl' : 'border-slate-200 hover:border-slate-300'}`}>
+                    <div className={`w-full bg-white border-2 border-dashed rounded-[40px] p-16 flex flex-col items-center justify-center transition-all ${isUploading ? 'border-aprovex-blue animate-pulse' : 'border-slate-200 hover:border-slate-300'}`}>
                       {!isUploading ? (
                         <>
                           <input type="file" id="cv-upload" className="hidden" accept=".pdf" onChange={handleFileChange} />
-                          <label htmlFor="cv-upload" className="w-20 h-20 bg-slate-900 rounded-[24px] flex items-center justify-center mb-6 cursor-pointer hover:scale-105 transition-all shadow-xl shadow-slate-900/20 group"><Upload className="w-7 h-7 text-white group-hover:text-aprovex-blue transition-colors" /></label>
+                          <label htmlFor="cv-upload" className="w-20 h-20 bg-slate-900 rounded-[24px] flex items-center justify-center mb-6 cursor-pointer hover:scale-105 active:scale-95 transition-all shadow-xl shadow-slate-900/20 group"><Upload className="w-7 h-7 text-white group-hover:text-aprovex-blue transition-colors" /></label>
                           {file ? (
                             <div className="text-center animate-fade-in">
                               <p className="text-sm font-black text-slate-900 uppercase tracking-tighter mb-2">{file.name}</p>
@@ -160,17 +212,12 @@ const Dashboard: React.FC = () => {
                           ) : (
                             <div className="text-center">
                               <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em]">Upload do Currículo (PDF)</p>
-                              <p className="text-slate-300 text-[9px] mt-2 font-bold uppercase">Auditoria realista e rígida</p>
                             </div>
                           )}
                         </>
                       ) : (
                         <div className="flex flex-col items-center py-4">
-                          <div className="relative w-16 h-16 mb-6">
-                            <div className="absolute inset-0 border-[3px] border-slate-100 rounded-full"></div>
-                            <div className="absolute inset-0 border-[3px] border-aprovex-blue border-t-transparent rounded-full animate-spin"></div>
-                            <div className="absolute inset-0 flex items-center justify-center"><Activity className="w-6 h-6 text-aprovex-blue animate-pulse" /></div>
-                          </div>
+                          <div className="w-10 h-10 border-[3px] border-aprovex-blue border-t-transparent rounded-full animate-spin mb-4"></div>
                           <p className="text-[10px] font-black text-slate-800 uppercase tracking-[0.3em] animate-pulse">{steps[uploadStep]}</p>
                         </div>
                       )}
@@ -178,14 +225,13 @@ const Dashboard: React.FC = () => {
                   </div>
                 </div>
               ) : (
-                <div className="animate-fade-in-up space-y-6 pb-24">
-                  {/* Dashboard BI Realista */}
+                <div className="animate-fade-in space-y-6 pb-24">
                   <div className="flex items-center justify-between border-b border-slate-100 pb-8">
                     <div>
                       <button onClick={() => setAnalysisResult(null)} className="text-[9px] font-black text-slate-400 uppercase tracking-widest hover:text-aprovex-blue flex items-center gap-1.5 mb-3 transition-all group"><ChevronRight className="w-3 h-3 rotate-180 group-hover:-translate-x-1" /> Nova Triagem</button>
                       <h2 className="text-2xl font-black text-slate-900 tracking-tighter leading-none mb-2 uppercase italic">Relatório <span className="text-aprovex-blue underline underline-offset-4 decoration-2">Auditoria ATS</span></h2>
                       <div className="flex items-center gap-4 text-[9px] font-black text-slate-500 uppercase tracking-widest">
-                        <span className="flex items-center gap-1.5 bg-slate-900 text-white px-2 py-1 rounded-md"><Target className="w-3.5 h-3.5 text-aprovex-blue" /> Vaga: {analysisResult.jobTitle}</span>
+                        <span className="flex items-center gap-1.5 bg-slate-900 text-white px-2 py-1 rounded-md tracking-tighter"><Target className="w-3.5 h-3.5 text-aprovex-blue" /> Vaga: {analysisResult.jobTitle}</span>
                         <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> Data: {analysisResult.analysisDate}</span>
                       </div>
                     </div>
@@ -196,55 +242,67 @@ const Dashboard: React.FC = () => {
                   </div>
 
                   <div className="grid lg:grid-cols-4 gap-6">
-                    {/* Score Global (Pena Capital se faltar dados) */}
-                    <div className="bg-white p-8 rounded-[32px] border border-slate-100 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
-                      <div className="absolute top-0 right-0 p-4 opacity-5"><Activity className="w-20 h-20 text-slate-900" /></div>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-8 text-center">Score Geral de Triagem</p>
-                      <div className="relative w-36 h-36 flex items-center justify-center mb-6">
-                        <svg className="w-full h-full transform -rotate-90">
-                          <circle cx="72" cy="72" r="66" stroke="#F8FAFC" strokeWidth="12" fill="transparent" />
-                          <circle cx="72" cy="72" r="66" stroke={analysisResult.score > 74 ? '#10B981' : analysisResult.score > 49 ? '#F59E0B' : '#EF4444'} strokeWidth="12" fill="transparent" strokeDasharray={414} strokeDashoffset={414 - (414 * analysisResult.score) / 100} strokeLinecap="round" className="transition-all duration-1000 ease-out" />
-                        </svg>
-                        <div className="absolute text-center">
-                          <span className="text-5xl font-black text-slate-900 tracking-tighter leading-none">{analysisResult.score}</span>
-                          <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1">Pontos / 100</p>
+                    {/* Score Global e Veredito Sincero */}
+                    <div className="lg:col-span-1 space-y-6">
+                      <div className="bg-white p-8 rounded-[32px] border border-slate-100 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-8 text-center">Score Geral</p>
+                        <div className="relative w-32 h-32 flex items-center justify-center mb-6">
+                          <svg className="w-full h-full transform -rotate-90">
+                            <circle cx="64" cy="64" r="58" stroke="#F8FAFC" strokeWidth="12" fill="transparent" />
+                            <circle cx="64" cy="64" r="58" stroke="#EF4444" strokeWidth="12" fill="transparent" strokeDasharray={364} strokeDashoffset={364 - (364 * analysisResult.score) / 100} strokeLinecap="round" className="transition-all duration-1000 ease-out" />
+                          </svg>
+                          <div className="absolute text-center">
+                            <span className="text-4xl font-black text-slate-900 tracking-tighter leading-none">{analysisResult.score}</span>
+                            <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest mt-1">Pontos</p>
+                          </div>
+                        </div>
+                        <div className="px-5 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border bg-red-50 text-red-600 border-red-100">
+                          {analysisResult.matchClass}
                         </div>
                       </div>
-                      <div className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border ${analysisResult.score > 74 ? 'bg-green-50 text-green-600 border-green-100' : analysisResult.score > 49 ? 'bg-amber-50 text-amber-600 border-amber-100' : 'bg-red-50 text-red-600 border-red-100'}`}>
-                        {analysisResult.matchClass}
+
+                      <div className="bg-slate-900 p-6 rounded-[32px] border border-slate-800">
+                        <div className="flex items-center gap-2 mb-4">
+                          <AlertCircle className="w-4 h-4 text-red-500" />
+                          <span className="text-[10px] font-black text-white uppercase tracking-widest">Veredito Direto</span>
+                        </div>
+                        <p className="text-slate-400 text-[11px] font-bold leading-relaxed italic">
+                          "{analysisResult.verdict}"
+                        </p>
                       </div>
                     </div>
 
-                    {/* BI Indicators (12 Métricas Conforme Briefing) */}
+                    {/* BI Indicators com Clicabilidade */}
                     <div className="lg:col-span-3 bg-white p-8 rounded-[32px] border border-slate-100 shadow-sm">
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-8 pb-4 border-b border-slate-50">Auditoria Técnica de Indicadores (Métricas 1-12)</p>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-8 pb-4 border-b border-slate-50">Auditoria Técnica de Indicadores (Clique no título para ver o ideal)</p>
                       <div className="grid md:grid-cols-2 gap-x-12 gap-y-6">
                         {analysisResult.atsMetrics.map((m: any, i: number) => (
                           <div key={i} className="space-y-2 group">
-                            <div className="flex justify-between items-end">
-                              <span className="text-[9px] font-black text-slate-600 uppercase tracking-tight">{m.label}</span>
+                            <button 
+                              onClick={() => setModalMetric(m.label)}
+                              className="flex justify-between items-end w-full hover:opacity-70 transition-all text-left"
+                            >
+                              <span className="text-[9px] font-black text-slate-600 uppercase tracking-tight flex items-center gap-1.5">
+                                {m.label} <Info className="w-3 h-3 text-slate-300" />
+                              </span>
                               <span className={`text-[10px] font-black ${m.status === 'Crítico' || m.status === 'Nulo' || m.status === 'Pobre' ? 'text-red-500' : 'text-slate-900'}`}>{m.isStatus ? m.value : `${m.value}%`}</span>
-                            </div>
-                            <div className="h-1.5 w-full bg-slate-50 rounded-full overflow-hidden border border-slate-100">
+                            </button>
+                            <div className="h-1 w-full bg-slate-50 rounded-full overflow-hidden border border-slate-100">
                               <div className="h-full transition-all duration-1000 ease-out" style={{ 
                                 width: m.isStatus ? '100%' : (m.isRisk ? `${100-m.value}%` : `${m.value}%`), 
                                 backgroundColor: m.isStatus ? '#F1F5F9' : (m.status === 'Forte' || m.status === 'OK' ? '#10B981' : m.status === 'Regular' ? '#F59E0B' : '#EF4444') 
                               }} />
                             </div>
-                            <div className="flex items-center gap-1.5">
-                              <div className={`w-1 h-1 rounded-full ${m.status === 'Forte' || m.status === 'OK' ? 'bg-green-500' : m.status === 'Regular' ? 'bg-amber-500' : 'bg-red-500'}`} />
-                              <p className="text-[9px] text-slate-400 font-bold group-hover:text-slate-500 transition-colors uppercase tracking-tighter">{m.detail}</p>
-                            </div>
+                            <p className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter">{m.detail}</p>
                           </div>
                         ))}
                       </div>
                     </div>
 
-                    {/* Skill Gap Score (Bloqueantes Reais) */}
+                    {/* Skill Gap e Riscos */}
                     <div className="lg:col-span-2 bg-white border border-slate-100 rounded-[32px] shadow-sm overflow-hidden flex flex-col">
                       <div className="bg-slate-900 px-6 py-4 flex items-center justify-between">
                         <span className="text-[10px] font-black text-white uppercase tracking-widest flex items-center gap-2"><Layers className="w-3.5 h-3.5 text-aprovex-blue" /> Lacunas de Competência</span>
-                        <span className="text-[9px] font-black text-red-400 uppercase tracking-widest">BLOQUEANTE</span>
                       </div>
                       <div className="p-6 space-y-4 flex-grow">
                         {analysisResult.gaps.map((gap: any, i: number) => (
@@ -259,10 +317,9 @@ const Dashboard: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Riscos & Qualidade (Rigidez Absoluta) */}
                     <div className="lg:col-span-2 bg-white border border-slate-100 rounded-[32px] shadow-sm overflow-hidden flex flex-col">
                       <div className="bg-red-50 px-6 py-4 border-b border-red-100 flex items-center justify-between">
-                        <span className="text-[10px] font-black text-red-700 uppercase tracking-widest flex items-center gap-2"><ShieldAlert className="w-3.5 h-3.5" /> Riscos de Rejeição</span>
+                        <span className="text-[10px] font-black text-red-700 uppercase tracking-widest flex items-center gap-2"><ShieldAlert className="w-3.5 h-3.5 text-red-500" /> Riscos de Rejeição</span>
                       </div>
                       <div className="p-6 space-y-5 flex-grow">
                         {analysisResult.qualityAlerts.map((alert: any, i: number) => (
@@ -277,9 +334,8 @@ const Dashboard: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Action Plan BI Strategy */}
+                    {/* Action Plan */}
                     <div className="lg:col-span-4 bg-[#0F172A] p-8 rounded-[40px] relative group overflow-hidden">
-                      <div className="absolute -bottom-10 -right-10 opacity-5 transition-opacity"><Zap className="w-40 h-40 text-white" /></div>
                       <div className="relative z-10">
                         <h4 className="text-[11px] font-black text-aprovex-blue uppercase tracking-[0.3em] mb-8 flex items-center gap-2 italic"><Sparkles className="w-4 h-4" /> Plano de Retomada de Performance</h4>
                         <div className="grid md:grid-cols-3 gap-8">
