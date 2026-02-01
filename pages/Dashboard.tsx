@@ -14,12 +14,16 @@ const Dashboard: React.FC = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStep, setUploadStep] = useState(0);
   const [analysisResult, setAnalysisResult] = useState<any>(null);
+  const [jobUrl, setJobUrl] = useState('');
+  const [file, setFile] = useState<File | null>(null);
+  const [isProcessingReal, setIsProcessingReal] = useState(false);
 
   const steps = [
-    "Digitalizando documento...",
-    "Extraindo dados com OCR...",
-    "IA analisando palavras-chave...",
-    "Calculando Score ATS..."
+    "Acessando link da vaga...",
+    "Extraindo requisitos do cargo...",
+    "Digitalizando seu currículo...",
+    "IA comparando perfil vs vaga...",
+    "Calculando Score de Match..."
   ];
 
   const handleLogout = async () => {
@@ -27,8 +31,21 @@ const Dashboard: React.FC = () => {
     window.location.href = '/?page=login';
   };
 
-  const simulateUpload = () => {
-    if (credits <= 0) return;
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFile(e.target.files[0]);
+    }
+  };
+
+  const startAnalysis = async () => {
+    if (!file) {
+      alert("Por favor, selecione um arquivo de currículo (PDF).");
+      return;
+    }
+    if (credits <= 0) {
+      alert("Créditos insuficientes.");
+      return;
+    }
     
     setIsUploading(true);
     setUploadStep(0);
@@ -36,35 +53,40 @@ const Dashboard: React.FC = () => {
     // Efeito de progresso realístico
     const interval = setInterval(() => {
       setUploadStep(prev => {
-        if (prev >= 3) {
+        if (prev >= 4) {
           clearInterval(interval);
-          return 3;
+          return 4;
         }
         return prev + 1;
       });
-    }, 1200);
+    }, 1500);
 
+    // Aqui entrará a lógica real via Supabase Edge Function ou API
+    // Por enquanto, simulamos o tempo de processamento da IA
     setTimeout(() => {
       setAnalysisResult({
-        score: 88,
-        matchLevel: 'Excelente',
+        score: jobUrl ? 74 : 88,
+        matchLevel: jobUrl ? 'Match Médio' : 'Excelente',
         analysisDate: new Date().toLocaleDateString(),
+        jobAnalyzed: jobUrl || 'Análise Geral de Perfil',
         strengths: [
-          "Estrutura otimizada para leitura de máquinas (ATS)",
-          "Uso estratégico de verbos de ação",
-          "Seção de habilidades bem categorizada"
+          "Experiência sólida com tecnologias core",
+          "Formatação profissional e limpa",
+          "Objetivo profissional bem definido"
         ],
         improvements: [
-          "Adicionar resultados quantitativos nas experiências recentes",
-          "Incluir certificações específicas da área de tecnologia",
-          "Otimizar o resumo profissional para a vaga de Desenvolvedor"
+          jobUrl ? "Seu currículo não menciona 'Docker', que é requisito na vaga" : "Adicionar resultados quantitativos",
+          "Otimizar a seção de idiomas",
+          jobUrl ? "A vaga pede 'Inglês Avançado', seu CV não especifica o nível" : "Incluir links de portfólio"
         ],
-        skillsMatched: ["React", "TypeScript", "Node.js", "Tailwind CSS", "Git"],
-        missingKeywords: ["Docker", "AWS", "CI/CD"]
+        skillsMatched: ["React", "TypeScript", "Node.js"],
+        missingKeywords: jobUrl ? ["Docker", "Kubernetes", "English Advanced"] : ["Portfólio", "Certificações"]
       });
       setIsUploading(false);
       setCredits(prev => prev - 1);
-    }, 5500);
+      setFile(null);
+      setJobUrl('');
+    }, 7500);
   };
 
   return (
@@ -142,45 +164,92 @@ const Dashboard: React.FC = () => {
                       Otimize sua <span className="text-aprovex-blue">Carreira</span>
                     </h2>
                     <p className="text-slate-400 font-medium text-lg max-w-lg mx-auto leading-relaxed">
-                      Nossa IA analisa seu currículo conforme os critérios dos recrutadores reais.
+                      Cole o link da vaga e suba seu currículo para uma análise de match personalizada.
                     </p>
                   </div>
                   
-                  {/* Dropzone Elegante */}
-                  <div 
-                    onClick={simulateUpload}
-                    className={`w-full max-w-2xl bg-white border-2 border-dashed rounded-[40px] p-12 md:p-20 flex flex-col items-center justify-center transition-all duration-500 cursor-pointer group relative overflow-hidden ${isUploading ? 'border-aprovex-blue ring-8 ring-blue-50 animate-pulse' : 'border-slate-100 hover:border-aprovex-blue/40 hover:bg-slate-50/30'}`}
-                  >
-                    {!isUploading ? (
-                      <>
-                        <div className="w-24 h-24 bg-blue-50 rounded-3xl flex items-center justify-center mb-8 group-hover:scale-110 transition-all duration-500 group-hover:bg-aprovex-blue group-hover:rotate-6">
-                          <Upload className="w-10 h-10 text-aprovex-blue group-hover:text-white transition-colors" />
-                        </div>
-                        <h3 className="text-2xl font-black text-slate-800 tracking-tight mb-2">Selecione seu Currículo</h3>
-                        <p className="text-slate-400 font-medium text-center">Arraste seu arquivo PDF aqui ou <span className="text-aprovex-blue underline font-bold">clique para buscar</span>.</p>
-                        <div className="mt-8 flex gap-6 text-[10px] font-black text-slate-300 uppercase tracking-widest">
-                          <span className="flex items-center gap-1.5"><ShieldCheck className="w-3 h-3" /> 100% Seguro</span>
-                          <span className="flex items-center gap-1.5"><Clock className="w-3 h-3" /> Análise Instantânea</span>
-                        </div>
-                      </>
-                    ) : (
-                      <div className="flex flex-col items-center">
-                        <div className="w-20 h-20 relative flex items-center justify-center mb-8">
-                          <div className="absolute inset-0 border-4 border-blue-100 rounded-full"></div>
-                          <div className="absolute inset-0 border-4 border-aprovex-blue border-t-transparent rounded-full animate-spin"></div>
-                          <Sparkles className="w-8 h-8 text-aprovex-blue" />
-                        </div>
-                        <h3 className="text-2xl font-black text-slate-800 tracking-tight mb-4 animate-pulse">
-                          {steps[uploadStep]}
-                        </h3>
-                        <div className="w-64 h-2 bg-slate-100 rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-aprovex-blue transition-all duration-500 ease-out" 
-                            style={{ width: `${(uploadStep + 1) * 25}%` }}
-                          />
-                        </div>
+                  <div className="w-full max-w-2xl space-y-6">
+                    {/* Input do Link da Vaga */}
+                    <div className="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm">
+                      <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">Link da Vaga (Opcional)</label>
+                      <div className="relative group">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-aprovex-blue transition-colors" />
+                        <input 
+                          type="url" 
+                          placeholder="https://www.linkedin.com/jobs/view/..."
+                          className="w-full pl-11 pr-4 py-4 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:border-aprovex-blue outline-none font-medium text-sm transition-all placeholder:text-slate-300"
+                          value={jobUrl}
+                          onChange={(e) => setJobUrl(e.target.value)}
+                        />
                       </div>
-                    )}
+                    </div>
+
+                    {/* Dropzone Elegante */}
+                    <div 
+                      className={`w-full bg-white border-2 border-dashed rounded-[40px] p-12 flex flex-col items-center justify-center transition-all duration-500 relative overflow-hidden ${isUploading ? 'border-aprovex-blue ring-8 ring-blue-50 animate-pulse' : 'border-slate-100'}`}
+                    >
+                      {!isUploading ? (
+                        <>
+                          <input 
+                            type="file" 
+                            id="cv-upload" 
+                            className="hidden" 
+                            accept=".pdf" 
+                            onChange={handleFileChange} 
+                          />
+                          <label 
+                            htmlFor="cv-upload"
+                            className="w-20 h-20 bg-blue-50 rounded-3xl flex items-center justify-center mb-6 cursor-pointer hover:scale-110 transition-all duration-500 hover:bg-aprovex-blue group"
+                          >
+                            <Upload className="w-8 h-8 text-aprovex-blue group-hover:text-white transition-colors" />
+                          </label>
+                          
+                          {file ? (
+                            <div className="text-center animate-fade-in">
+                              <p className="text-lg font-black text-slate-800 tracking-tight">{file.name}</p>
+                              <button onClick={() => setFile(null)} className="text-[10px] font-black text-red-400 uppercase tracking-widest mt-2 hover:text-red-500">Remover arquivo</button>
+                            </div>
+                          ) : (
+                            <div className="text-center">
+                              <h3 className="text-xl font-black text-slate-800 tracking-tight mb-1">Selecione seu Currículo</h3>
+                              <p className="text-slate-400 text-sm font-medium">Clique no ícone acima para subir seu PDF</p>
+                            </div>
+                          )}
+
+                          {file && (
+                            <button 
+                              onClick={startAnalysis}
+                              className="mt-8 px-10 py-5 bg-aprovex-blue text-white rounded-2xl font-black text-sm uppercase tracking-[0.15em] shadow-xl shadow-blue-500/20 hover:bg-blue-700 transition-all flex items-center gap-3 active:scale-95"
+                            >
+                              Iniciar Análise Profissional
+                              <ArrowRight className="w-5 h-5" />
+                            </button>
+                          )}
+                          
+                          <div className="mt-8 flex gap-6 text-[9px] font-black text-slate-300 uppercase tracking-[0.2em]">
+                            <span className="flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5" /> 100% Seguro</span>
+                            <span className="flex items-center gap-1.5"><Target className="w-3.5 h-3.5" /> Foco em Aprovação</span>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="flex flex-col items-center py-10">
+                          <div className="w-20 h-20 relative flex items-center justify-center mb-8">
+                            <div className="absolute inset-0 border-4 border-blue-100 rounded-full"></div>
+                            <div className="absolute inset-0 border-4 border-aprovex-blue border-t-transparent rounded-full animate-spin"></div>
+                            <Sparkles className="w-8 h-8 text-aprovex-blue" />
+                          </div>
+                          <h3 className="text-2xl font-black text-slate-800 tracking-tight mb-4 animate-pulse text-center">
+                            {steps[uploadStep]}
+                          </h3>
+                          <div className="w-64 h-2 bg-slate-100 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-aprovex-blue transition-all duration-500 ease-out" 
+                              style={{ width: `${(uploadStep + 1) * 20}%` }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -189,10 +258,13 @@ const Dashboard: React.FC = () => {
                   <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
                     <div>
                       <button onClick={() => setAnalysisResult(null)} className="flex items-center gap-2 text-[11px] font-black text-slate-400 uppercase tracking-widest hover:text-aprovex-blue transition-colors mb-4 group">
-                        <ChevronRight className="w-4 h-4 rotate-180 group-hover:-translate-x-1 transition-transform" /> Voltar para o Início
+                        <ChevronRight className="w-4 h-4 rotate-180 group-hover:-translate-x-1 transition-transform" /> Nova Análise
                       </button>
                       <h2 className="text-4xl font-black text-slate-800 tracking-tighter leading-none mb-2">Relatório de <span className="text-aprovex-blue">Performance</span></h2>
-                      <p className="text-slate-400 font-medium italic">Análise gerada em {analysisResult.analysisDate}</p>
+                      <div className="flex items-center gap-2 text-slate-400 text-sm font-medium">
+                        <Target className="w-4 h-4 text-aprovex-blue" />
+                        <span className="truncate max-w-[300px]">{analysisResult.jobAnalyzed}</span>
+                      </div>
                     </div>
                     
                     <div className="flex gap-3">
