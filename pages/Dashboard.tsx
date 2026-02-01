@@ -183,7 +183,7 @@ const Dashboard: React.FC = () => {
                   <div className="flex items-center justify-between border-b border-slate-100 pb-8">
                     <div>
                       <button onClick={() => setAnalysisResult(null)} className="text-[9px] font-black text-slate-400 uppercase tracking-widest hover:text-aprovex-blue flex items-center gap-1.5 mb-3 transition-all group"><ChevronRight className="w-3 h-3 rotate-180 group-hover:-translate-x-1" /> Nova Triagem</button>
-                      <h2 className="text-2xl font-black text-slate-900 tracking-tighter leading-none mb-2 uppercase italic">Audit <span className="text-aprovex-blue">#ATS-BI</span></h2>
+                      <h2 className="text-2xl font-black text-slate-900 tracking-tighter leading-none mb-2 uppercase italic">Relatório <span className="text-aprovex-blue underline underline-offset-4 decoration-2">Auditoria ATS</span></h2>
                       <div className="flex items-center gap-4 text-[9px] font-black text-slate-500 uppercase tracking-widest">
                         <span className="flex items-center gap-1.5 bg-slate-900 text-white px-2 py-1 rounded-md"><Target className="w-3.5 h-3.5 text-aprovex-blue" /> Vaga: {analysisResult.jobTitle}</span>
                         <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> Data: {analysisResult.analysisDate}</span>
