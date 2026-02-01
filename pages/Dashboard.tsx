@@ -55,14 +55,18 @@ const Dashboard: React.FC = () => {
         analysisDate: new Date().toLocaleDateString(),
         jobTitle: jobUrl ? 'Cargo Alvo Detectado' : 'Perfil Geral Executivo',
         
-        // Métricas Core (Seção de BI)
+        // Métricas Core (Seção de BI atualizada com os 12 pilares)
         atsMetrics: [
-          { label: 'Keyword Match Rate', value: 65, status: 'Regular', detail: 'Faltam 4 keywords críticas.' },
-          { label: 'Keyword Placement', value: 40, status: 'Crítico', detail: 'Keywords ausentes no resumo/título.' },
-          { label: 'Keyword Density', value: 'Ideal', status: 'OK', detail: 'Sem indícios de keyword stuffing.', isStatus: true },
-          { label: 'Semantic Skill Match', value: 72, status: 'Bom', detail: 'Skills implícitas reconhecidas.' },
-          { label: 'ATS Parsing & Structure', value: 85, status: 'Forte', detail: 'Layout compatível com leitura.' },
-          { label: 'Quantification Score', value: 20, status: 'Crítico', detail: 'Apenas 1 exp. possui números.' }
+          { label: 'Keyword Match Rate', value: 65, status: 'Regular', detail: 'Cobertura de termos-chave.' },
+          { label: 'Keyword Placement', value: 40, status: 'Crítico', detail: 'Localização estratégica.' },
+          { label: 'Keyword Density', value: 'Ideal', status: 'OK', detail: 'Otimização de frequência.', isStatus: true },
+          { label: 'Semantic Skill Match', value: 72, status: 'Bom', detail: 'Similaridade semântica.' },
+          { label: 'ATS Parsing Score', value: 85, status: 'Forte', detail: 'Leitura técnica de estrutura.' },
+          { label: 'Content Quality', value: 50, status: 'Regular', detail: 'Qualidade do conteúdo ATS.' },
+          { label: 'Quantification Score', value: 20, status: 'Crítico', detail: 'Métricas de impacto.' },
+          { label: 'Experience Relevance', value: 68, status: 'Bom', detail: 'Contexto profissional vs vaga.' },
+          { label: 'Customization Score', value: 30, status: 'Crítico', detail: 'Nível de personalização.' },
+          { label: 'ATS Risk Score', value: 15, status: 'Forte', detail: 'Fatores de penalização.', isRisk: true }
         ],
 
         // 6. Skill Gaps (Bloqueantes)
@@ -232,7 +236,10 @@ const Dashboard: React.FC = () => {
                               <span className={`text-[10px] font-black ${m.status === 'OK' || m.status === 'Forte' ? 'text-green-500' : m.status === 'Regular' ? 'text-amber-500' : 'text-red-500'}`}>{m.isStatus ? m.value : `${m.value}%`}</span>
                             </div>
                             <div className="h-1.5 w-full bg-slate-50 rounded-full overflow-hidden border border-slate-100">
-                              <div className="h-full transition-all duration-1000 ease-out" style={{ width: m.isStatus ? '100%' : `${m.value}%`, backgroundColor: m.color || (m.status === 'Forte' || m.status === 'OK' ? '#10B981' : m.status === 'Regular' ? '#F59E0B' : '#EF4444') }} />
+                              <div className="h-full transition-all duration-1000 ease-out" style={{ 
+                                width: m.isStatus ? '100%' : (m.isRisk ? `${100 - m.value}%` : `${m.value}%`), 
+                                backgroundColor: m.color || (m.status === 'Forte' || m.status === 'OK' ? '#10B981' : m.status === 'Regular' ? '#F59E0B' : '#EF4444') 
+                              }} />
                             </div>
                             <div className="flex items-center gap-1.5">
                               <div className={`w-1 h-1 rounded-full ${m.status === 'OK' || m.status === 'Forte' ? 'bg-green-500' : m.status === 'Regular' ? 'bg-amber-500' : 'bg-red-500'}`} />
